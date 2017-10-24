@@ -1,5 +1,7 @@
 #define ERRO 		0
 #define OK 		 	1
+#define IGUAL 		10
+#define DIF		 	11
 
 #include <stdio.h>
 #include <conio.h>
@@ -8,7 +10,7 @@
 
 // estrutura de um elemento, no da arvore
 struct sNo {
-	int valor ,freq;
+	int valor, freq;
 	char carcter;
 	struct sNo *esq;
 	struct sNo *dir;
@@ -27,16 +29,19 @@ void imprime_pre_order(sNo *a);
 void imprime_in_order(sNo *a);
 void imprime_pos_order(sNo *a);
 void imprime_textual(sNo *a);
+int checkVetor(char c, struct sNo *vetor);
 
 int altura(sNo *a);
 int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
 int main() {
-	int r, v, cont = 0;
+	int r,k=0, v, cont = 0;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
 	FILE *file;
-	char c;
+	char c, aux, ch;
+	struct sNo *p, vn[100], *vp;
+	vp = vn;
 
 	a3 = cria(3, 2, 'a', inicializa(), inicializa(), &r);
 	a4 = cria(4, 2, 'c', inicializa(), inicializa(), &r);
@@ -58,17 +63,32 @@ int main() {
 		return 0;
 	}
 
-	do {
+	for(int i = 0;c != EOF; i++){
 		c = fgetc(file);
+		if (checkVetor(c, vp) == DIF) {
+			(vn + k)->carcter = c;
+			(vn + k)->dir = NULL;
+			(vn + k)->esq = NULL;
+			rewind(file);
+			
+			do {
+				ch = fgetc(file);
+				if (c == ch) {
+					(vn + k)->freq;
+				}
+			} while (ch != EOF);
+			k++;
+		}
+		
 		printf("%c", c);
-	} while (c != EOF);
+
+	} 
 	printf("\n");
 	fclose(file);
 
 
 
 
-	
 
 
 
@@ -82,8 +102,9 @@ int main() {
 
 
 
-	
-	
+
+
+
 	/*
 	sNo *a0, *a1, *a2, *a3, *a4, *a5; // exemplo 1
 	sNo *a10; // exemplo 2
@@ -93,12 +114,12 @@ int main() {
 
 	/*  Exemplo 1 ------------------------------------------------------------------------
 	Criando a seguinte arvore:
-	  0
+	0
 	/   \
 	1    2
 	\   / \
-	 3 4   5
-	
+	3 4   5
+
 	a3 = cria(3, inicializa(), inicializa(), &r);
 	a4 = cria(4, inicializa(), inicializa(), &r);
 	a5 = cria(5, inicializa(), inicializa(), &r);
@@ -106,40 +127,40 @@ int main() {
 	a2 = cria(2, a4, a5, &r);
 	a0 = cria(0, a1, a2, &r);
 	if (r) {
-		printf(":: Arvore a0 criada!");
-		printf("\n:: Pre-order: ");
-		imprime_pre_order(a0);
-		printf("\n:: In-order: ");
-		imprime_in_order(a0);
-		printf("\n:: Pos-order: ");
-		imprime_pos_order(a0);
-		printf("\n:: Textual: ");
-		imprime_textual(a0);
-		printf("\n:: a0 possui %d nos", qtdeNos(a0));
-		printf("\n:: a0 possui %d folhas", qtdeFolhas(a0));
-		printf("\n:: a0 possui altura de %d \n", altura(a0));
+	printf(":: Arvore a0 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a0);
+	printf("\n:: In-order: ");
+	imprime_in_order(a0);
+	printf("\n:: Pos-order: ");
+	imprime_pos_order(a0);
+	printf("\n:: Textual: ");
+	imprime_textual(a0);
+	printf("\n:: a0 possui %d nos", qtdeNos(a0));
+	printf("\n:: a0 possui %d folhas", qtdeFolhas(a0));
+	printf("\n:: a0 possui altura de %d \n", altura(a0));
 
-		getch();
+	getch();
 	}
 	else printf("=> Erro na criacao da arvore!\n");
 
 
 	/* Exemplo 2 -----------------------------------------------------------------------------
 	Outro exemplo de arvore e formato para criacao:
-	  21
+	21
 	/   \
 	20   21
-	
+
 	a10 = cria(10,cria(20, NULL, NULL, &r),cria(21, NULL, NULL, &r),&r);
 	if (r) {
-		printf("\n\n:: Arvore a10 criada!");
-		printf("\n:: Pre-order: ");
-		imprime_pre_order(a10);
-		printf("\n:: Textual: ");
-		imprime_textual(a10);
-		printf("\n:: a10 possui %d nos", qtdeNos(a10));
-		printf("\n:: a10 possui %d folhas", qtdeFolhas(a10));
-		printf("\n:: a10 possui altura de %d \n", altura(a10));
+	printf("\n\n:: Arvore a10 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a10);
+	printf("\n:: Textual: ");
+	imprime_textual(a10);
+	printf("\n:: a10 possui %d nos", qtdeNos(a10));
+	printf("\n:: a10 possui %d folhas", qtdeFolhas(a10));
+	printf("\n:: a10 possui altura de %d \n", altura(a10));
 	}
 	else printf("=> Erro na criacao da arvore!\n");
 
@@ -153,14 +174,14 @@ int main() {
 	// arvore com um unico no raiz
 	a20 = cria(20, inicializa(), inicializa(), &r);
 	if (r) {
-		printf("\n\n:: Arvore a20 criada!");
-		printf("\n:: Pre-order: ");
-		imprime_pre_order(a20);
-		printf("\n:: Textual: ");
-		imprime_textual(a20);
-		printf("\n:: a0 possui %d nos", qtdeNos(a20));
-		printf("\n:: a0 possui %d folhas", qtdeFolhas(a20));
-		printf("\n:: a0 possui altura de %d \n", altura(a20));
+	printf("\n\n:: Arvore a20 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a20);
+	printf("\n:: Textual: ");
+	imprime_textual(a20);
+	printf("\n:: a0 possui %d nos", qtdeNos(a20));
+	printf("\n:: a0 possui %d folhas", qtdeFolhas(a20));
+	printf("\n:: a0 possui altura de %d \n", altura(a20));
 	}
 	else printf("=> Erro na criacao da arvore!\n");
 
@@ -169,16 +190,16 @@ int main() {
 	// Arvore vazia
 	a30 = inicializa();
 	if (r) {
-		printf("\n\n:: Arvore a30 criada!");
-		printf("\n:: Pre-order: ");
-		imprime_pre_order(a30);
-		printf("\n:: Textual: ");
-		imprime_textual(a30);
-		printf("\n:: a0 possui %d nos", qtdeNos(a30));
-		printf("\n:: a0 possui %d folhas", qtdeFolhas(a30));
-		printf("\n:: a0 possui altura de %d \n", altura(a30));
+	printf("\n\n:: Arvore a30 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a30);
+	printf("\n:: Textual: ");
+	imprime_textual(a30);
+	printf("\n:: a0 possui %d nos", qtdeNos(a30));
+	printf("\n:: a0 possui %d folhas", qtdeFolhas(a30));
+	printf("\n:: a0 possui altura de %d \n", altura(a30));
 	}
-	else printf("=> Erro na criacao da arvore!\n"); 
+	else printf("=> Erro na criacao da arvore!\n");
 	return 0;
 	*/
 }
@@ -299,3 +320,15 @@ int qtdeFolhas(sNo *a) {
 	return qtdeFolhas(a->esq) + qtdeFolhas(a->dir);
 }
 
+int checkVetor(char c, struct sNo *vetor) {
+
+	for (int j = 0;j < 100;j++) {
+		if (c == (vetor + j)->carcter) {
+			return IGUAL;
+		}
+		else
+		{
+			return DIF;
+		}
+}
+}
