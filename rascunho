@@ -30,6 +30,7 @@ void imprime_in_order(sNo *a);
 void imprime_pos_order(sNo *a);
 void imprime_textual(sNo *a);
 int checkVetor(char c, struct sNo *vetor);
+void printVetor(struct sNo *vetor);
 
 int altura(sNo *a);
 int qtdeNos(sNo *a);
@@ -57,13 +58,13 @@ int main() {
 
 	printf("\n");
 
-	file = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\test.txt", "r");
+	file = fopen("C:\\Temp\\test.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
 	}
 
-	for(int i = 0;c != EOF; i++){
+	do{
 		c = fgetc(file);
 		if (checkVetor(c, vp) == DIF) {
 			(vn + k)->carcter = c;
@@ -81,9 +82,9 @@ int main() {
 			rewind(file);
 		}
 		
-		printf("%c", c);
 
-	} 
+	} while (c != EOF);
+	printVetor(vp);
 	printf("\n");
 	fclose(file);
 
@@ -332,4 +333,12 @@ int checkVetor(char c, struct sNo *vetor) {
 			return DIF;
 		}
 }
+}
+
+void printVetor(struct sNo *vetor) {
+
+	for (int l = 0; l < 100; l++) {
+		printf("caracter %c frequencia %d\n", (vetor + l)->carcter, (vetor + l)->freq);
+
+	}
 }
