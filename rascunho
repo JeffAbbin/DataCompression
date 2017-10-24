@@ -37,7 +37,7 @@ int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
 int main() {
-	int r,k=0, v, cont = 0;
+	int r, k = 0, v, cont = 0;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
 	FILE *file;
 	char c, aux, ch;
@@ -58,30 +58,31 @@ int main() {
 
 	printf("\n");
 
-	file = fopen("C:\\Temp\\test.txt", "r");
+	file = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\test.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
 	}
 
-	do{
+	do {
 		c = fgetc(file);
 		if (checkVetor(c, vp) == DIF) {
 			(vn + k)->carcter = c;
 			(vn + k)->dir = NULL;
 			(vn + k)->esq = NULL;
 			rewind(file);
-			
+			cont = 0;
 			do {
 				ch = fgetc(file);
 				if (c == ch) {
-					(vn + k)->freq;
+					cont++;
+					(vn + k)->freq = cont;
 				}
 			} while (ch != EOF);
 			k++;
 			rewind(file);
 		}
-		
+
 
 	} while (c != EOF);
 	printVetor(vp);
@@ -324,15 +325,13 @@ int qtdeFolhas(sNo *a) {
 
 int checkVetor(char c, struct sNo *vetor) {
 
-	for (int j = 0;j < 100;j++) {
+	for (int j = 0; j < 100; j++) {
 		if (c == (vetor + j)->carcter) {
 			return IGUAL;
 		}
-		else
-		{
-			return DIF;
-		}
-}
+		
+	}
+	return DIF;
 }
 
 void printVetor(struct sNo *vetor) {
