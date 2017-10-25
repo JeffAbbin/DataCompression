@@ -31,6 +31,8 @@ void imprime_pos_order(sNo *a);
 void imprime_textual(sNo *a);
 int checkVetor(char c, struct sNo *vetor);
 void printVetor(struct sNo *vetor);
+void inicilizaVetor(struct sNo *vetor);
+void ordenaVetor(struct sNo *vetor);
 
 int altura(sNo *a);
 int qtdeNos(sNo *a);
@@ -41,7 +43,7 @@ int main() {
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
 	FILE *file;
 	char c, aux, ch;
-	struct sNo *p, vn[100], *vp;
+	struct sNo *p, vn[255], *vp;
 	vp = vn;
 
 	a3 = cria(3, 2, 'a', inicializa(), inicializa(), &r);
@@ -57,6 +59,7 @@ int main() {
 	imprime_pre_order(a0);
 
 	printf("\n");
+	inicilizaVetor(vp);
 
 	file = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\test.txt", "r");
 	if (file == NULL) {
@@ -86,6 +89,10 @@ int main() {
 
 	} while (c != EOF);
 	printVetor(vp);
+	printf("\n");
+	ordenaVetor(vp);
+	printVetor(vp);
+
 	printf("\n");
 	fclose(file);
 
@@ -325,7 +332,7 @@ int qtdeFolhas(sNo *a) {
 
 int checkVetor(char c, struct sNo *vetor) {
 
-	for (int j = 0; j < 100; j++) {
+	for (int j = 0; j < 255; j++) {
 		if (c == (vetor + j)->carcter) {
 			return IGUAL;
 		}
@@ -336,8 +343,47 @@ int checkVetor(char c, struct sNo *vetor) {
 
 void printVetor(struct sNo *vetor) {
 
-	for (int l = 0; l < 100; l++) {
-		printf("caracter %c frequencia %d\n", (vetor + l)->carcter, (vetor + l)->freq);
+	for (int l = 0; l < 255; l++) {
+		if ((vetor + l)->carcter == NULL && (vetor + l)->dir == NULL && (vetor + l)->esq == NULL && (vetor + l)->freq == NULL && (vetor + l)->valor == NULL) {
+			
+		}
+		else
+		{
+			printf("caracter %c frequencia %d\n", (vetor + l)->carcter, (vetor + l)->freq);
+		}
+	}
+}
 
+void inicilizaVetor(struct sNo *vetor) {
+	for (int t = 0; t < 255; t++) {
+		(vetor + t)->carcter = NULL;
+		(vetor + t)->dir = NULL;
+		(vetor + t)->esq = NULL;
+		(vetor + t)->freq = NULL;
+		(vetor + t)->valor = NULL;
+	}
+
+}
+
+void ordenaVetor(struct sNo *vetor) {
+	for (int l = 0; l < 255; l++) {
+		if ((vetor + l)->carcter == NULL && (vetor + l)->dir == NULL && (vetor + l)->esq == NULL && (vetor + l)->freq == NULL && (vetor + l)->valor == NULL) {
+
+		}
+		else
+		{
+			int p;
+			struct sNo aux2;
+
+			for (int d = 1; d < 255; d++) {
+				aux2 = vetor[d];
+				p = d - 1;
+				while (p >= 0 && (vetor + p)->freq > aux2.freq) {
+					vetor [p + 1] = vetor[p];
+					p--;
+				}
+				vetor [p + 1] = aux2;
+			}
+		}
 	}
 }
