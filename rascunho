@@ -39,12 +39,13 @@ int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
 int main() {
-	int r, k = 0, v, cont = 0;
+	int r, k = 0, v, cont = 0, q;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
 	FILE *file;
 	char c, aux, ch;
-	struct sNo *p, vn[255], *vp;
+	struct sNo *p, vn[255], *va[255], *vp;
 	vp = vn;
+	
 
 	a3 = cria(3, 2, 'a', inicializa(), inicializa(), &r);
 	a4 = cria(4, 2, 'c', inicializa(), inicializa(), &r);
@@ -61,7 +62,7 @@ int main() {
 	printf("\n");
 	inicilizaVetor(vp);
 
-	file = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\test.txt", "r");
+	file = fopen("C:\\Temp\\test.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
@@ -85,9 +86,13 @@ int main() {
 			k++;
 			rewind(file);
 		}
-
+	
 
 	} while (c != EOF);
+	(vn + (k - 1))->valor = NULL;
+	(vn + (k - 1))->carcter = NULL;
+	(vn + (k - 1))->dir = NULL;
+	(vn + (k - 1))->esq = NULL;
 	printVetor(vp);
 	printf("\n");
 	ordenaVetor(vp);
@@ -336,7 +341,7 @@ int checkVetor(char c, struct sNo *vetor) {
 		if (c == (vetor + j)->carcter) {
 			return IGUAL;
 		}
-		
+
 	}
 	return DIF;
 }
@@ -345,7 +350,7 @@ void printVetor(struct sNo *vetor) {
 
 	for (int l = 0; l < 255; l++) {
 		if ((vetor + l)->carcter == NULL && (vetor + l)->dir == NULL && (vetor + l)->esq == NULL && (vetor + l)->freq == NULL && (vetor + l)->valor == NULL) {
-			
+
 		}
 		else
 		{
@@ -378,12 +383,22 @@ void ordenaVetor(struct sNo *vetor) {
 			for (int d = 1; d < 255; d++) {
 				aux2 = vetor[d];
 				p = d - 1;
-				while (p >= 0 && (vetor + p)->freq > aux2.freq) {
-					vetor [p + 1] = vetor[p];
+				while (p >= 0 && (vetor + p)->freq < aux2.freq) {
+					vetor[p + 1] = vetor[p];
 					p--;
 				}
-				vetor [p + 1] = aux2;
+				vetor[p + 1] = aux2;
 			}
 		}
 	}
+}
+
+void montaArvore(struct sNo *vetor, struct sNo *vArvore) {
+	struct sNo *no;
+	for (int y = 0;y < 255;y++) {
+		for (int b = 0;b < 2;b++) {
+			
+		}
+}
+
 }
