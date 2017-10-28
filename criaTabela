@@ -21,3 +21,5 @@ void criaTabela(unsigned char tabela[][150], sNo* no, unsigned char *string, int
         criaTabela(tabela,no->right, string, pos+1);//recursivamente roda a mesma função para mais uma vez rodar a subarvore da direita, porém numa posição na frente
     }
 }
+
+/*ainda precisa percorrer a árvore e definir um caracter com aquele código*/ 
