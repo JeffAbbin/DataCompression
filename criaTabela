@@ -1,0 +1,23 @@
+/*Arquivo com função que cria da tabela de símbolos*/
+
+void criaTabela(unsigned char tabela[][150], sNo* no, unsigned char *string, int pos){
+    
+    if(no->left == NULL && no->right == NULL){
+        string[pos] = '\0';
+        strncpy(tabela[no->character],string,pos+1); 
+        return;
+    }
+    
+    /*strncpy copia os caracteres de uma string para outra, e podemos decidir o tamanho que será copiado*/
+    
+    if(no->left != NULL) //se subarvre da esquerda != de nulo
+    {
+        string[pos] = '0'; //define o nó da subarvore da esquerda (na posição definida) como `0`
+        criaTabela(tabela,no->left, string, pos+1); //recursivamente roda a mesma função para mais uma vez rodar a subarvore da esquerda, porém numa posição na frente
+    }
+    if(no->right != NULL) //se subarvore da direita != de nulo
+	}
+        string[pos] = '1'; //define o nó da subarvore da direita (na posição definida) como `1`
+        criaTabela(tabela,no->right, string, pos+1);//recursivamente roda a mesma função para mais uma vez rodar a subarvore da direita, porém numa posição na frente
+    }
+}
