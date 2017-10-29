@@ -1,0 +1,57 @@
+
+void compress(){
+
+    char nome_entrada[200],nome_saida[200],aux[150];
+    int frequency[256] = {0};
+
+    FILE* arquivo;
+    FILE* novo_arquivo;
+
+    while(1){
+
+        system("cls");
+        printf("Digite o nome do arquivo:\n");
+        scanf("%[^\n]s", nome_entrada);
+        getchar();
+        arquivo = fopen(nome_entrada,"rb");
+        if(arquivo == NULL){
+            printf("O nome do arquivo ou caminho esta incorreto!\n Tente novamente...");
+            system("pause");
+            continue;
+        }
+        printf("Digite o nome do arquivo de saida:\n");
+        scanf("%[^\n]s", nome_saida);
+        getchar();
+        break;
+    }
+
+    strcat(nome_saida,".huff");
+
+    frequency_count(arquivo, frequency);
+    fseek(arquivo,0,SEEK_SET);
+    system("cls");
+    printf("Aguarde ...\n");
+
+    Tree* bt = build_huffman_tree(frequency);
+    system("cls");
+    printf("Aguarde ...\n");
+
+    BYTE tabela[256][150];
+    creat_table(tabela,bt,aux,0);
+
+    system("cls");
+    printf("Aguarde ...\n");
+
+    novo_arquivo = fopen(nome_saida,"wb");
+
+    int size_tree;
+    BYTE aux1;
+    size_tree = creating_huffman_string(bt, novo_arquivo);
+
+    write_compress(tabela,arquivo,novo_arquivo, size_tree);
+
+    printf("Concluido com exito!");
+
+    fclose(arquivo);
+    fclose(novo_arquivo);
+}
