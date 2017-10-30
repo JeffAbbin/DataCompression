@@ -19,7 +19,7 @@ struct sNo {
 typedef struct sNo sNo;
 
 sNo *inicializa();
-sNo *cria(int valor, int freq, char caracter, sNo *sae, sNo *sad, int *res);
+sNo *cria(int freq, char caracter, sNo *sae, sNo *sad, int res);
 
 
 int e_vazia(sNo *a);
@@ -33,6 +33,10 @@ int checkVetor(char c, struct sNo *vetor);
 void printVetor(struct sNo *vetor);
 void inicilizaVetor(struct sNo *vetor);
 void ordenaVetor(struct sNo *vetor);
+void apontaVetor(struct sNo *vetorp[], struct sNo *vetor);
+void printVetorp(struct sNo *vetor[]);
+void ordenaVetorp(struct sNo *vetor[]);
+void montaArvore(struct sNo *vetorp[]);
 
 int altura(sNo *a);
 int qtdeNos(sNo *a);
@@ -45,24 +49,10 @@ int main() {
 	char c, aux, ch;
 	struct sNo *p, vn[255], *va[255], *vp;
 	vp = vn;
-	
 
-	a3 = cria(3, 2, 'a', inicializa(), inicializa(), &r);
-	a4 = cria(4, 2, 'c', inicializa(), inicializa(), &r);
-	a5 = cria(5, 5, 'h', inicializa(), inicializa(), &r);
-	a1 = cria(1, NULL, NULL, inicializa(), a3, &r);
-	a2 = cria(2, NULL, NULL, a4, a5, &r);
-	a0 = cria(0, NULL, NULL, a1, a2, &r);
-
-
-	printf(":: Arvore a0 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a0);
-
-	printf("\n");
 	inicilizaVetor(vp);
 
-	file = fopen("C:\\Temp\\test.txt", "r");
+	file = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\test.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
@@ -86,17 +76,25 @@ int main() {
 			k++;
 			rewind(file);
 		}
-	
+
 
 	} while (c != EOF);
 	(vn + (k - 1))->valor = NULL;
 	(vn + (k - 1))->carcter = NULL;
 	(vn + (k - 1))->dir = NULL;
 	(vn + (k - 1))->esq = NULL;
+	(vn + (k - 1))->freq = NULL;
+	apontaVetor(va,vn);
 	printVetor(vp);
+	printVetorp(va);
 	printf("\n");
 	ordenaVetor(vp);
+	ordenaVetorp(va);
 	printVetor(vp);
+	printVetorp(va);
+
+	montaArvore(va);
+	imprime_textual(va[0]);
 
 	printf("\n");
 	fclose(file);
@@ -225,17 +223,16 @@ sNo *inicializa(void) {
 	return NULL;
 }
 // 2) eh composta por uma raiz e duas subarvores (esquerda e direita)
-sNo *cria(int valor, int freq, char caracter, sNo *sae, sNo *sad, int *res) {
+sNo *cria(int freq, char caracter, sNo *sae, sNo *sad, int res) {
 	sNo *no;
 	no = (sNo *)malloc(sizeof(sNo));
-	if (no == NULL) *res = ERRO;
+	if (no == NULL) res = ERRO;
 	else {
 		no->esq = sae;
 		no->dir = sad;
-		no->valor = valor;
 		no->carcter = caracter;
 		no->freq = freq;
-		*res = OK;
+		res = OK;
 	}
 	return no;
 }
@@ -246,11 +243,11 @@ int e_vazia(sNo *a) {
 }
 
 // indica ocorrencia ou nao do valor na arvore
-int busca(int valor, sNo *a) {
+int busca(char c, sNo *a) {
 	if (e_vazia(a))
 		return 0;
 	else // encontra ou busca a esquerda ou busca a direita, interrompe assim que achar
-		return a->valor == valor || busca(valor, a->esq) || busca(valor, a->dir);
+		return a->carcter == c || busca(c, a->esq) || busca(c, a->dir);
 }
 
 // impressao dos nos da arvore:
@@ -293,7 +290,7 @@ void imprime_textual(sNo *a) {
 	if (e_vazia(a))
 		printf("<>");
 	else {
-		printf("<%d", a->valor);
+		printf("<%c", a->carcter);
 		imprime_textual(a->esq);
 		imprime_textual(a->dir);
 		printf(">");
@@ -358,6 +355,18 @@ void printVetor(struct sNo *vetor) {
 		}
 	}
 }
+void printVetorp(struct sNo *vetor[]) {
+
+	for (int l = 0; l < 255; l++) {
+		if (vetor[l]->carcter == NULL && vetor[l]->dir == NULL && vetor[l]->esq == NULL && vetor[l]->freq == NULL && vetor[l]->valor == NULL) {
+
+		}
+		else
+		{
+			printf("caracter %c frequencia %d\n", vetor[l]->carcter, vetor[l]->freq);
+		}
+	}
+}
 
 void inicilizaVetor(struct sNo *vetor) {
 	for (int t = 0; t < 255; t++) {
@@ -393,12 +402,57 @@ void ordenaVetor(struct sNo *vetor) {
 	}
 }
 
-void montaArvore(struct sNo *vetor, struct sNo *vArvore) {
-	struct sNo *no;
-	for (int y = 0;y < 255;y++) {
-		for (int b = 0;b < 2;b++) {
-			
+
+
+void ordenaVetorp(struct sNo *vetor[]) {
+	for (int l = 0; l < 255; l++) {
+		if (vetor[l]->carcter == NULL && vetor[l]->dir == NULL && vetor[l]->esq == NULL && vetor[l]->freq == NULL && vetor[l]->valor == NULL) {
+
 		}
+		else
+		{
+			int p;
+			struct sNo *aux2;
+
+			for (int d = 1; d < 255; d++) {
+				aux2 = vetor[d];
+				p = d - 1;
+				while (p >= 0 && vetor[p]->freq < aux2->freq) {
+					vetor[p + 1] = vetor[p];
+					p--;
+				}
+				vetor[p + 1] = aux2;
+			}
+		}
+	}
 }
+
+void apontaVetor(struct sNo *vetorp[], struct sNo *vetor) {
+	for (int i = 0; i < 255; i++) {
+		vetorp[i] = (vetor + i);
+	}
+
+}
+
+void montaArvore(struct sNo *vetorp[]) {
+	struct sNo *esq, *dir, *no;
+	int j = 0, s;
+	for (int l = 0; l < 255; l++) {
+		if (vetorp[l]->carcter == NULL && vetorp[l]->dir == NULL && vetorp[l]->esq == NULL && vetorp[l]->freq == NULL && vetorp[l]->valor == NULL) {
+		}
+		else
+		{
+			j++;
+		}
+	}
+	while (j > 1) {
+		ordenaVetorp(vetorp);
+		esq = vetorp[j - 1];
+		dir = vetorp[j - 2];
+		s = esq->freq + dir->freq;
+		no = cria(s, '_', esq, dir, OK);
+		vetorp[j - 2] = no;
+		j--;
+	}
 
 }
