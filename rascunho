@@ -85,14 +85,10 @@ int main() {
 	(vn + (k - 1))->esq = NULL;
 	(vn + (k - 1))->freq = NULL;
 	apontaVetor(va,vn);
-	printVetor(vp);
+	
+	ordenaVetorp(va);
 	printVetorp(va);
 	printf("\n");
-	ordenaVetor(vp);
-	ordenaVetorp(va);
-	printVetor(vp);
-	printVetorp(va);
-
 	montaArvore(va);
 	imprime_textual(va[0]);
 
