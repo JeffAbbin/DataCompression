@@ -16,6 +16,11 @@ struct sNo {
 	struct sNo *dir;
 };
 
+struct simbolo {
+	char c, sim[150];
+};
+
+typedef struct simbolo simbolo;
 typedef struct sNo sNo;
 
 sNo *inicializa();
@@ -23,7 +28,7 @@ sNo *cria(int freq, char caracter, sNo *sae, sNo *sad, int res);
 
 
 int e_vazia(sNo *a);
-int busca(int valor, sNo *a);
+int busca(char c, sNo *a);
 
 void imprime_pre_order(sNo *a);
 void imprime_in_order(sNo *a);
@@ -37,18 +42,25 @@ void apontaVetor(struct sNo *vetorp[], struct sNo *vetor);
 void printVetorp(struct sNo *vetor[]);
 void ordenaVetorp(struct sNo *vetor[]);
 void montaArvore(struct sNo *vetorp[]);
+void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *s, int *j);
+void printTabela(struct simbolo *simb);
+int checktam(struct sNo *vetorp[]);
 
 int altura(sNo *a);
 int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
 int main() {
-	int r, k = 0, v, cont = 0, q;
+	int r, k = 0, v, cont = 0, q, j =0, *jp, a=0;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
 	FILE *file;
-	char c, aux, ch;
+	char c, aux, ch, string[150],*s, textob[1000];
 	struct sNo *p, vn[255], *va[255], *vp;
+	struct simbolo simbolo[150];
 	vp = vn;
+	jp = &j;
+	
+	s = string;
 
 	inicilizaVetor(vp);
 
@@ -86,11 +98,39 @@ int main() {
 	(vn + (k - 1))->freq = NULL;
 	apontaVetor(va,vn);
 	
-	ordenaVetorp(va);
-	printVetorp(va);
 	printf("\n");
+	ordenaVetorp(va);
+
+	printVetorp(va);
+
 	montaArvore(va);
+	criaTabela(simbolo, va[0],0, s, &j);
 	imprime_textual(va[0]);
+	printf("\n");
+	printTabela(simbolo);
+
+	rewind(file);
+	int h = 0;
+	do {
+		c = fgetc(file);
+		for (int q = 0; q < checktam(va); q++) {
+			if ((simbolo + q)->c == c) {
+				while ((simbolo + q)->sim[a] != '\0') {
+					textob[h] = (simbolo + q)->sim[a];
+					h++;
+					a++;
+				}
+				a = 0;
+			}
+		}
+	} while (c != EOF);
+
+	for (int v = 0; v < 1000; v++) {
+		printf("%c", textob[v]);
+	}
+
+
+
 
 	printf("\n");
 	fclose(file);
@@ -443,12 +483,63 @@ void montaArvore(struct sNo *vetorp[]) {
 	}
 	while (j > 1) {
 		ordenaVetorp(vetorp);
-		esq = vetorp[j - 1];
-		dir = vetorp[j - 2];
+		dir = vetorp[j - 1];
+		esq = vetorp[j - 2];
 		s = esq->freq + dir->freq;
 		no = cria(s, '_', esq, dir, OK);
 		vetorp[j - 2] = no;
 		j--;
 	}
 
+}
+
+
+void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *string, int *j) {
+	
+	
+	if (no->esq == NULL && no->dir == NULL) {
+		string[pos] = '\0';
+		(simb+*j)->c = no->carcter;
+		strcpy((simb + *j)->sim, string);
+		*j = *j + 1;
+		return;
+	}
+
+	/*strncpy copia os caracteres de uma string para outra, e podemos decidir o tamanho que será copiado*/
+
+	if (no->esq != NULL) //se subarvre da esquerda != de nulo
+	{
+		string[pos] = '0'; //define o nó da subarvore da esquerda (na posição definida) como `0`
+		criaTabela(simb, no->esq, pos + 1, string, j); //recursivamente roda a mesma função para mais uma vez rodar a subarvore da esquerda, porém numa posição na frente
+	}
+	if (no->dir != NULL){ //se subarvore da direita != de nulo
+		string[pos] = '1'; //define o nó da subarvore da direita (na posição definida) como `1`
+		criaTabela(simb, no->dir, pos + 1, string, j);//recursivamente roda a mesma função para mais uma vez rodar a subarvore da direita, porém numa posição na frente
+	}
+}
+
+void printTabela(struct simbolo *simb) {
+	int i = 0;
+	for (int j = 0; j < 150; j++) {
+		printf("%c   ", (simb+j)->c);
+		while (simb->sim[i] != '\0') {
+			printf("%c", (simb+j)->sim[i]);
+			i++;
+		}
+		printf("\n");
+		i = 0;
+	}
+}
+ 
+int checktam(struct sNo *vetorp[]) {
+	int j = 0;
+	for (int l = 0; l < 255; l++) {
+		if (vetorp[l]->carcter == NULL && vetorp[l]->dir == NULL && vetorp[l]->esq == NULL && vetorp[l]->freq == NULL && vetorp[l]->valor == NULL) {
+		}
+		else
+		{
+			j++;
+		}
+	}
+	return j;
 }
