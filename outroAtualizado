@@ -1,0 +1,614 @@
+#define ERRO 		0
+#define OK 		 	1
+#define IGUAL 		10
+#define DIF		 	11
+
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// estrutura de um elemento, no da arvore
+struct sNo {
+	int valor, freq;
+	char carcter;
+	struct sNo *esq;
+	struct sNo *dir;
+};
+
+struct simbolo {
+	char c, sim[150];
+};
+
+typedef struct simbolo simbolo;
+typedef struct sNo sNo;
+
+sNo *inicializa();
+sNo *cria(int freq, char caracter, sNo *sae, sNo *sad, int res);
+
+
+int e_vazia(sNo *a);
+int busca(char c, sNo *a);
+
+void imprime_pre_order(sNo *a);
+void imprime_in_order(sNo *a);
+void imprime_pos_order(sNo *a);
+void imprime_textual(sNo *a);
+int checkVetor(char c, struct sNo *vetor);
+void printVetor(struct sNo *vetor);
+void inicilizaVetor(struct sNo *vetor);
+void ordenaVetor(struct sNo *vetor);
+void apontaVetor(struct sNo *vetorp[], struct sNo *vetor);
+void printVetorp(struct sNo *vetor[]);
+void ordenaVetorp(struct sNo *vetor[]);
+void montaArvore(struct sNo *vetorp[]);
+void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *s, int *j);
+void printTabela(struct simbolo *simb);
+int checktam(struct sNo *vetorp[]);
+
+int altura(sNo *a);
+int qtdeNos(sNo *a);
+int qtdeFolhas(sNo *a);
+
+int main() {
+	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0;
+	sNo *a0, *a1, *a2, *a3, *a4, *a5;
+	FILE *file;
+	char c, aux, ch, string[150], *s, textob[1000];
+	struct sNo *p, vn[255], *va[255], *vp;
+	struct simbolo simbolo[150];
+	FILE *input, *output;
+	vp = vn;
+	jp = &j;
+
+	s = string;
+
+	inicilizaVetor(vp);
+
+	file = fopen("C:\\Users\\gigio\\Desktop\\dataCpmpression\\ConsoleApplication1\\ConsoleApplication1\\Teste.txt", "r");
+	if (file == NULL) {
+		printf("Erro - nao foi possivel ler arquivo\n");
+		return 0;
+	}
+
+	do {
+		c = fgetc(file);
+		if (checkVetor(c, vp) == DIF) {
+			(vn + k)->carcter = c;
+			(vn + k)->dir = NULL;
+			(vn + k)->esq = NULL;
+			rewind(file);
+			cont = 0;
+			do {
+				ch = fgetc(file);
+				if (c == ch) {
+					cont++;
+					(vn + k)->freq = cont;
+				}
+			} while (ch != EOF);
+			k++;
+			rewind(file);
+		}
+
+
+	} while (c != EOF);
+	(vn + (k - 1))->valor = NULL;
+	(vn + (k - 1))->carcter = NULL;
+	(vn + (k - 1))->dir = NULL;
+	(vn + (k - 1))->esq = NULL;
+	(vn + (k - 1))->freq = NULL;
+	apontaVetor(va, vn);
+
+	printf("\n");
+	ordenaVetorp(va);
+
+	printVetorp(va);
+
+	montaArvore(va);
+	criaTabela(simbolo, va[0], 0, s, &j);
+	imprime_textual(va[0]);
+	printf("\n");
+	printTabela(simbolo);
+
+	rewind(file);
+	int h = 0;
+	do {
+		c = fgetc(file);
+		for (int q = 0; q < checktam(va); q++) {
+			if ((simbolo + q)->c == c) {
+				while ((simbolo + q)->sim[a] != '\0') {
+					textob[h] = (simbolo + q)->sim[a];
+					h++;
+					a++;
+				}
+				a = 0;
+			}
+		}
+	} while (c != EOF);
+
+	for (int v = 0; v < 1000; v++) {
+		printf("%c", textob[v]);
+	}
+
+
+
+
+	printf("\n");
+	fclose(file);
+
+	printf("Digite o nome do arquivo a ser compactado:n");
+	scanf("%s", filename);
+	printf("1 - Comprimir /n2 - Descomprimir:n");
+	scanf("%d", &compress);
+
+
+	input = fopen(filename, "r");
+	output = fopen("output.txt", "w");
+
+	if (compress == 1)
+		compressFile(input, output, codeTable2);
+	else
+		decompressFile(input, output, tree);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/*
+	sNo *a0, *a1, *a2, *a3, *a4, *a5; // exemplo 1
+	sNo *a10; // exemplo 2
+	sNo *a20; // exemplo 3: arvore com um unico no raiz
+	sNo *a30; // exemplo 4: para exemplo de arvore vazia
+	int r, v;
+
+	/*  Exemplo 1 ------------------------------------------------------------------------
+	Criando a seguinte arvore:
+	0
+	/   \
+	1    2
+	\   / \
+	3 4   5
+
+	a3 = cria(3, inicializa(), inicializa(), &r);
+	a4 = cria(4, inicializa(), inicializa(), &r);
+	a5 = cria(5, inicializa(), inicializa(), &r);
+	a1 = cria(1, inicializa(), a3, &r);
+	a2 = cria(2, a4, a5, &r);
+	a0 = cria(0, a1, a2, &r);
+	if (r) {
+	printf(":: Arvore a0 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a0);
+	printf("\n:: In-order: ");
+	imprime_in_order(a0);
+	printf("\n:: Pos-order: ");
+	imprime_pos_order(a0);
+	printf("\n:: Textual: ");
+	imprime_textual(a0);
+	printf("\n:: a0 possui %d nos", qtdeNos(a0));
+	printf("\n:: a0 possui %d folhas", qtdeFolhas(a0));
+	printf("\n:: a0 possui altura de %d \n", altura(a0));
+
+	getch();
+	}
+	else printf("=> Erro na criacao da arvore!\n");
+
+
+	/* Exemplo 2 -----------------------------------------------------------------------------
+	Outro exemplo de arvore e formato para criacao:
+	21
+	/   \
+	20   21
+
+	a10 = cria(10,cria(20, NULL, NULL, &r),cria(21, NULL, NULL, &r),&r);
+	if (r) {
+	printf("\n\n:: Arvore a10 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a10);
+	printf("\n:: Textual: ");
+	imprime_textual(a10);
+	printf("\n:: a10 possui %d nos", qtdeNos(a10));
+	printf("\n:: a10 possui %d folhas", qtdeFolhas(a10));
+	printf("\n:: a10 possui altura de %d \n", altura(a10));
+	}
+	else printf("=> Erro na criacao da arvore!\n");
+
+
+	// Exemplo do usa da funcao de busca -----------------------------------------------------
+	if (busca(4, a0)) printf("\n\nValor 4 esta presente na arvore a0\n");
+	if (!busca(4, a10)) printf("Valor 4 nao esta presente na arvore a10\n");
+	getch();
+
+	// Exemplo 3 -----------------------------------------------------------------------------
+	// arvore com um unico no raiz
+	a20 = cria(20, inicializa(), inicializa(), &r);
+	if (r) {
+	printf("\n\n:: Arvore a20 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a20);
+	printf("\n:: Textual: ");
+	imprime_textual(a20);
+	printf("\n:: a0 possui %d nos", qtdeNos(a20));
+	printf("\n:: a0 possui %d folhas", qtdeFolhas(a20));
+	printf("\n:: a0 possui altura de %d \n", altura(a20));
+	}
+	else printf("=> Erro na criacao da arvore!\n");
+
+
+	// Exemplo 4 ---------------------------------------------------------------------------
+	// Arvore vazia
+	a30 = inicializa();
+	if (r) {
+	printf("\n\n:: Arvore a30 criada!");
+	printf("\n:: Pre-order: ");
+	imprime_pre_order(a30);
+	printf("\n:: Textual: ");
+	imprime_textual(a30);
+	printf("\n:: a0 possui %d nos", qtdeNos(a30));
+	printf("\n:: a0 possui %d folhas", qtdeFolhas(a30));
+	printf("\n:: a0 possui altura de %d \n", altura(a30));
+	}
+	else printf("=> Erro na criacao da arvore!\n");
+	return 0;
+	*/
+}
+
+// definicao recursiva de arvore binaria:
+// 1) uma arvore binaria eh vazia, ou
+sNo *inicializa(void) {
+	return NULL;
+}
+// 2) eh composta por uma raiz e duas subarvores (esquerda e direita)
+sNo *cria(int freq, char caracter, sNo *sae, sNo *sad, int res) {
+	sNo *no;
+	no = (sNo *)malloc(sizeof(sNo));
+	if (no == NULL) res = ERRO;
+	else {
+		no->esq = sae;
+		no->dir = sad;
+		no->carcter = caracter;
+		no->freq = freq;
+		res = OK;
+	}
+	return no;
+}
+
+// verifica se arvore a eh vazia
+int e_vazia(sNo *a) {
+	return a == NULL;
+}
+
+// indica ocorrencia ou nao do valor na arvore
+int busca(char c, sNo *a) {
+	if (e_vazia(a))
+		return 0;
+	else // encontra ou busca a esquerda ou busca a direita, interrompe assim que achar
+		return a->carcter == c || busca(c, a->esq) || busca(c, a->dir);
+}
+
+// impressao dos nos da arvore:
+//    -> pre-order/pré-ordem: trata raiz, percorre sae, percorre sad
+//    -> in-order/ordem simétrica: percorre sae, trata raiz, percorre sad
+//    -> pos-order/pós-ordem: percorre sae, percorre sad, trata raiz
+void imprime_pre_order(sNo *a) {
+	if (!e_vazia(a)) {
+		printf("%d", a->valor);
+		if (a->carcter != NULL) {
+			printf("%c", a->carcter);
+		}
+		else
+			printf(" ");
+		imprime_pre_order(a->esq);
+		printf(" ");
+		imprime_pre_order(a->dir);
+		printf(" ");
+	}
+}
+
+void imprime_in_order(sNo *a) {
+	if (!e_vazia(a)) {
+		imprime_in_order(a->esq);
+		printf(" %d ", a->valor);
+		imprime_in_order(a->dir);
+	}
+}
+
+void imprime_pos_order(sNo *a) {
+	if (!e_vazia(a)) {
+		imprime_pos_order(a->esq);
+		imprime_pos_order(a->dir);
+		printf(" %d ", a->valor);
+	}
+}
+
+// representacao textual, percurso eh pre-order
+void imprime_textual(sNo *a) {
+	if (e_vazia(a))
+		printf("<>");
+	else {
+		printf("<%c", a->carcter);
+		imprime_textual(a->esq);
+		imprime_textual(a->dir);
+		printf(">");
+	}
+}
+
+// retorna a altura da arvore
+int altura(sNo *a) {
+	int ae, ad;
+
+	if (a == NULL)
+		return -1; // arvore vazia tem altura -1 
+	else if (a->esq == NULL && a->dir == NULL)
+		return 0; // arvore com apenas raiz tem altura 0
+	else {
+		ae = altura(a->esq);
+		ad = altura(a->dir);
+		if (ae > ad)
+			return 1 + ae;
+		else
+			return 1 + ad;
+	}
+}
+
+// retorna a quantidade de nos da arvore
+int qtdeNos(sNo *a) {
+	if (a == NULL)
+		return 0;
+	else
+		return 1 + qtdeNos(a->esq) + qtdeNos(a->dir);
+}
+
+// retorna a quantidade de folhas (nos sem filhos) da arvore
+int qtdeFolhas(sNo *a) {
+	if (a == NULL)
+		return 0;
+	if (a->esq == NULL && a->dir == NULL)
+		return 1;
+	return qtdeFolhas(a->esq) + qtdeFolhas(a->dir);
+}
+
+int checkVetor(char c, struct sNo *vetor) {
+
+	for (int j = 0; j < 255; j++) {
+		if (c == (vetor + j)->carcter) {
+			return IGUAL;
+		}
+
+	}
+	return DIF;
+}
+
+void printVetor(struct sNo *vetor) {
+
+	for (int l = 0; l < 255; l++) {
+		if ((vetor + l)->carcter == NULL && (vetor + l)->dir == NULL && (vetor + l)->esq == NULL && (vetor + l)->freq == NULL && (vetor + l)->valor == NULL) {
+
+		}
+		else
+		{
+			printf("caracter %c frequencia %d\n", (vetor + l)->carcter, (vetor + l)->freq);
+		}
+	}
+}
+void printVetorp(struct sNo *vetor[]) {
+
+	for (int l = 0; l < 255; l++) {
+		if (vetor[l]->carcter == NULL && vetor[l]->dir == NULL && vetor[l]->esq == NULL && vetor[l]->freq == NULL && vetor[l]->valor == NULL) {
+
+		}
+		else
+		{
+			printf("caracter %c frequencia %d\n", vetor[l]->carcter, vetor[l]->freq);
+		}
+	}
+}
+
+void inicilizaVetor(struct sNo *vetor) {
+	for (int t = 0; t < 255; t++) {
+		(vetor + t)->carcter = NULL;
+		(vetor + t)->dir = NULL;
+		(vetor + t)->esq = NULL;
+		(vetor + t)->freq = NULL;
+		(vetor + t)->valor = NULL;
+	}
+
+}
+
+void ordenaVetor(struct sNo *vetor) {
+	for (int l = 0; l < 255; l++) {
+		if ((vetor + l)->carcter == NULL && (vetor + l)->dir == NULL && (vetor + l)->esq == NULL && (vetor + l)->freq == NULL && (vetor + l)->valor == NULL) {
+
+		}
+		else
+		{
+			int p;
+			struct sNo aux2;
+
+			for (int d = 1; d < 255; d++) {
+				aux2 = vetor[d];
+				p = d - 1;
+				while (p >= 0 && (vetor + p)->freq < aux2.freq) {
+					vetor[p + 1] = vetor[p];
+					p--;
+				}
+				vetor[p + 1] = aux2;
+			}
+		}
+	}
+}
+
+
+
+void ordenaVetorp(struct sNo *vetor[]) {
+	for (int l = 0; l < 255; l++) {
+		if (vetor[l]->carcter == NULL && vetor[l]->dir == NULL && vetor[l]->esq == NULL && vetor[l]->freq == NULL && vetor[l]->valor == NULL) {
+
+		}
+		else
+		{
+			int p;
+			struct sNo *aux2;
+
+			for (int d = 1; d < 255; d++) {
+				aux2 = vetor[d];
+				p = d - 1;
+				while (p >= 0 && vetor[p]->freq < aux2->freq) {
+					vetor[p + 1] = vetor[p];
+					p--;
+				}
+				vetor[p + 1] = aux2;
+			}
+		}
+	}
+}
+
+void apontaVetor(struct sNo *vetorp[], struct sNo *vetor) {
+	for (int i = 0; i < 255; i++) {
+		vetorp[i] = (vetor + i);
+	}
+
+}
+
+void montaArvore(struct sNo *vetorp[]) {
+	struct sNo *esq, *dir, *no;
+	int j = 0, s;
+	for (int l = 0; l < 255; l++) {
+		if (vetorp[l]->carcter == NULL && vetorp[l]->dir == NULL && vetorp[l]->esq == NULL && vetorp[l]->freq == NULL && vetorp[l]->valor == NULL) {
+		}
+		else
+		{
+			j++;
+		}
+	}
+	while (j > 1) {
+		ordenaVetorp(vetorp);
+		dir = vetorp[j - 1];
+		esq = vetorp[j - 2];
+		s = esq->freq + dir->freq;
+		no = cria(s, '_', esq, dir, OK);
+		vetorp[j - 2] = no;
+		j--;
+	}
+
+}
+
+
+void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *string, int *j) {
+
+
+	if (no->esq == NULL && no->dir == NULL) {
+		string[pos] = '\0';
+		(simb + *j)->c = no->carcter;
+		strcpy((simb + *j)->sim, string);
+		*j = *j + 1;
+		return;
+	}
+
+	/*strncpy copia os caracteres de uma string para outra, e podemos decidir o tamanho que será copiado*/
+
+	if (no->esq != NULL) //se subarvre da esquerda != de nulo
+	{
+		string[pos] = '0'; //define o nó da subarvore da esquerda (na posição definida) como `0`
+		criaTabela(simb, no->esq, pos + 1, string, j); //recursivamente roda a mesma função para mais uma vez rodar a subarvore da esquerda, porém numa posição na frente
+	}
+	if (no->dir != NULL) { //se subarvore da direita != de nulo
+		string[pos] = '1'; //define o nó da subarvore da direita (na posição definida) como `1`
+		criaTabela(simb, no->dir, pos + 1, string, j);//recursivamente roda a mesma função para mais uma vez rodar a subarvore da direita, porém numa posição na frente
+	}
+}
+
+void printTabela(struct simbolo *simb) {
+	int i = 0;
+	for (int j = 0; j < 150; j++) {
+		printf("%c   ", (simb + j)->c);
+		while (simb->sim[i] != '\0') {
+			printf("%c", (simb + j)->sim[i]);
+			i++;
+		}
+		printf("\n");
+		i = 0;
+	}
+}
+
+int checktam(struct sNo *vetorp[]) {
+	int j = 0;
+	for (int l = 0; l < 255; l++) {
+		if (vetorp[l]->carcter == NULL && vetorp[l]->dir == NULL && vetorp[l]->esq == NULL && vetorp[l]->freq == NULL && vetorp[l]->valor == NULL) {
+		}
+		else
+		{
+			j++;
+		}
+	}
+	return j;
+
+	void decompressFile(FILE *input, FILE *output, sNo *a0) {
+		sNo *a1 = a0;
+		char c, bit;
+		char mask = 1 << 7;
+		int i;
+
+		while ((c = fgetc(input)) != EOF) {
+
+			for (i = 0; i<8; i++) {
+				bit = c & mask;
+				c = c << 1;
+				if (bit == 0) {
+					a1 = a1->esq;
+					if (a1->caracter != 127) {
+						if (a1->caracter == 26)
+							fputc(32, output);
+						else
+							fputc(a1->caracter + 97, output);
+						a1 = a0;
+					}
+				}
+
+				else {
+					a1 = a1->dir;
+					if (a1->caracter != 127) {
+						if (a1->caracter == 26)
+							fputc(32, output);
+						else
+							fputc(a1->caracter + 97, output);
+						a1 = a0;
+					}
+				}
+			}
+		}
+
+		return;
+	}
+
+	/*void inverteCodigos(int tabelaCodigo[], int tabelaCodigo2[]) {
+		int i, n, copia;
+
+		for (i = 0; i<27; i++) {
+			n = tabelaCodigo[i];
+			copia = 0;
+			while (n>0) {
+				copia = copia * 10 + n % 10;
+				n /= 10;
+			}
+			tabelaCodigo2[i] = copia;
+		}
+
+		return;
+	}*/
+}
