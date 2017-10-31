@@ -51,15 +51,15 @@ int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
 int main() {
-	int r, k = 0, v, cont = 0, q, j =0, *jp, a=0;
+	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, textoInt[1000], b;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
 	FILE *file;
-	char c, aux, ch, string[150],*s, textob[1000];
+	char c, aux, ch, string[150], *s, textob[1000], byte[8];
 	struct sNo *p, vn[255], *va[255], *vp;
 	struct simbolo simbolo[150];
 	vp = vn;
 	jp = &j;
-	
+
 	s = string;
 
 	inicilizaVetor(vp);
@@ -96,15 +96,18 @@ int main() {
 	(vn + (k - 1))->dir = NULL;
 	(vn + (k - 1))->esq = NULL;
 	(vn + (k - 1))->freq = NULL;
-	apontaVetor(va,vn);
-	
+	apontaVetor(va, vn);
+	for (a = 0; a > 150; a++) {
+		(simbolo + a)->c = '$';
+	}
+
 	printf("\n");
 	ordenaVetorp(va);
 
 	printVetorp(va);
 
 	montaArvore(va);
-	criaTabela(simbolo, va[0],0, s, &j);
+	criaTabela(simbolo, va[0], 0, s, &j);
 	imprime_textual(va[0]);
 	printf("\n");
 	printTabela(simbolo);
@@ -125,11 +128,24 @@ int main() {
 		}
 	} while (c != EOF);
 
+	
+
 	for (int v = 0; v < 1000; v++) {
+		if(textob[v] == '0' || textob[v] == '1')
 		printf("%c", textob[v]);
 	}
-
-
+	
+	int y = 0;
+	b = 0;
+	while (textob[b] == '0' || textob[b] == '1') {
+	for (int i = 0; i < 8; i++) {
+		byte[i] = textob[b];
+		b++;
+	}
+	bin = atol(byte);
+	textoInt[y]= bin;
+	y++;
+}
 
 
 	printf("\n");
@@ -137,123 +153,7 @@ int main() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/*
-	sNo *a0, *a1, *a2, *a3, *a4, *a5; // exemplo 1
-	sNo *a10; // exemplo 2
-	sNo *a20; // exemplo 3: arvore com um unico no raiz
-	sNo *a30; // exemplo 4: para exemplo de arvore vazia
-	int r, v;
-
-	/*  Exemplo 1 ------------------------------------------------------------------------
-	Criando a seguinte arvore:
-	0
-	/   \
-	1    2
-	\   / \
-	3 4   5
-
-	a3 = cria(3, inicializa(), inicializa(), &r);
-	a4 = cria(4, inicializa(), inicializa(), &r);
-	a5 = cria(5, inicializa(), inicializa(), &r);
-	a1 = cria(1, inicializa(), a3, &r);
-	a2 = cria(2, a4, a5, &r);
-	a0 = cria(0, a1, a2, &r);
-	if (r) {
-	printf(":: Arvore a0 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a0);
-	printf("\n:: In-order: ");
-	imprime_in_order(a0);
-	printf("\n:: Pos-order: ");
-	imprime_pos_order(a0);
-	printf("\n:: Textual: ");
-	imprime_textual(a0);
-	printf("\n:: a0 possui %d nos", qtdeNos(a0));
-	printf("\n:: a0 possui %d folhas", qtdeFolhas(a0));
-	printf("\n:: a0 possui altura de %d \n", altura(a0));
-
-	getch();
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-
-
-	/* Exemplo 2 -----------------------------------------------------------------------------
-	Outro exemplo de arvore e formato para criacao:
-	21
-	/   \
-	20   21
-
-	a10 = cria(10,cria(20, NULL, NULL, &r),cria(21, NULL, NULL, &r),&r);
-	if (r) {
-	printf("\n\n:: Arvore a10 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a10);
-	printf("\n:: Textual: ");
-	imprime_textual(a10);
-	printf("\n:: a10 possui %d nos", qtdeNos(a10));
-	printf("\n:: a10 possui %d folhas", qtdeFolhas(a10));
-	printf("\n:: a10 possui altura de %d \n", altura(a10));
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-
-
-	// Exemplo do usa da funcao de busca -----------------------------------------------------
-	if (busca(4, a0)) printf("\n\nValor 4 esta presente na arvore a0\n");
-	if (!busca(4, a10)) printf("Valor 4 nao esta presente na arvore a10\n");
-	getch();
-
-	// Exemplo 3 -----------------------------------------------------------------------------
-	// arvore com um unico no raiz
-	a20 = cria(20, inicializa(), inicializa(), &r);
-	if (r) {
-	printf("\n\n:: Arvore a20 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a20);
-	printf("\n:: Textual: ");
-	imprime_textual(a20);
-	printf("\n:: a0 possui %d nos", qtdeNos(a20));
-	printf("\n:: a0 possui %d folhas", qtdeFolhas(a20));
-	printf("\n:: a0 possui altura de %d \n", altura(a20));
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-
-
-	// Exemplo 4 ---------------------------------------------------------------------------
-	// Arvore vazia
-	a30 = inicializa();
-	if (r) {
-	printf("\n\n:: Arvore a30 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a30);
-	printf("\n:: Textual: ");
-	imprime_textual(a30);
-	printf("\n:: a0 possui %d nos", qtdeNos(a30));
-	printf("\n:: a0 possui %d folhas", qtdeFolhas(a30));
-	printf("\n:: a0 possui altura de %d \n", altura(a30));
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-	return 0;
-	*/
 }
-
-// definicao recursiva de arvore binaria:
 // 1) uma arvore binaria eh vazia, ou
 sNo *inicializa(void) {
 	return NULL;
@@ -326,7 +226,7 @@ void imprime_textual(sNo *a) {
 	if (e_vazia(a))
 		printf("<>");
 	else {
-		printf("<%c", a->carcter);
+		printf("<%c/%d", a->carcter, a->freq);
 		imprime_textual(a->esq);
 		imprime_textual(a->dir);
 		printf(">");
@@ -521,13 +421,21 @@ void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *string, int
 void printTabela(struct simbolo *simb) {
 	int i = 0;
 	for (int j = 0; j < 150; j++) {
-		printf("%c   ", (simb+j)->c);
-		while (simb->sim[i] != '\0') {
-			printf("%c", (simb+j)->sim[i]);
-			i++;
+		if (simb->c == '$') {
+
 		}
-		printf("\n");
-		i = 0;
+		else
+		{
+
+
+			printf("%c   ", (simb + j)->c);
+			while (simb->sim[i] != '\0') {
+				printf("%c", (simb + j)->sim[i]);
+				i++;
+			}
+			printf("\n");
+			i = 0;
+		}
 	}
 }
  
@@ -543,3 +451,19 @@ int checktam(struct sNo *vetorp[]) {
 	}
 	return j;
 }
+int bin_to_dec(int bin)
+{
+	int total = 0;
+	int potenc = 1;
+
+	while (bin > 0) {
+		total += bin % 10 * potenc;
+		bin = bin / 10;
+		potenc = potenc * 2;
+
+		fprintf(stderr, "while\n");
+	}
+
+	return total;
+}
+
