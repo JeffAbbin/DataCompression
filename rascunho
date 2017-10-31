@@ -45,16 +45,18 @@ void montaArvore(struct sNo *vetorp[]);
 void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *s, int *j);
 void printTabela(struct simbolo *simb);
 int checktam(struct sNo *vetorp[]);
+int bin_to_dec(int bin);
+void imprime_textualf(sNo *a, FILE *file);
 
 int altura(sNo *a);
 int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
 int main() {
-	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, textoInt[1000], b;
+	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, b;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
-	FILE *file;
-	char c, aux, ch, string[150], *s, textob[1000], byte[8];
+	FILE *file, *file2;
+	char c, aux, ch, string[150], *s, textob[1000], byte[8], textoInt[1000];
 	struct sNo *p, vn[255], *va[255], *vp;
 	struct simbolo simbolo[150];
 	vp = vn;
@@ -143,13 +145,32 @@ int main() {
 		b++;
 	}
 	bin = atol(byte);
-	textoInt[y]= bin;
+	textoInt[y] = bin_to_dec(bin);
+
 	y++;
 }
+
+	file2 = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\testcompact.txt", "w");
+	if (file == NULL) {
+		printf("Erro - nao foi possivel ler arquivo\n");
+		return 0;
+	}
+
+	fprintf(file2, "JGL\n");
+	for (int i = 0; i < y; i++) {
+		fprintf(file2, "%c ", textoInt[i]);
+	}
+	fprintf(file2, "\n");
+	imprime_textualf(va[0], file2);
+
+
+
+
 
 
 	printf("\n");
 	fclose(file);
+	fclose(file2);
 
 
 
@@ -230,6 +251,17 @@ void imprime_textual(sNo *a) {
 		imprime_textual(a->esq);
 		imprime_textual(a->dir);
 		printf(">");
+	}
+}
+
+void imprime_textualf(sNo *a, FILE *file) {
+	if (e_vazia(a))
+		fprintf(file,"<>");
+	else {
+		fprintf(file,"<%c/%d", a->carcter, a->freq);
+		imprime_textualf(a->esq, file);
+		imprime_textualf(a->dir,file);
+		fprintf(file,">");
 	}
 }
 
@@ -421,13 +453,7 @@ void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *string, int
 void printTabela(struct simbolo *simb) {
 	int i = 0;
 	for (int j = 0; j < 150; j++) {
-		if (simb->c == '$') {
-
-		}
-		else
-		{
-
-
+		
 			printf("%c   ", (simb + j)->c);
 			while (simb->sim[i] != '\0') {
 				printf("%c", (simb + j)->sim[i]);
@@ -436,7 +462,7 @@ void printTabela(struct simbolo *simb) {
 			printf("\n");
 			i = 0;
 		}
-	}
+	
 }
  
 int checktam(struct sNo *vetorp[]) {
