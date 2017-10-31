@@ -1,0 +1,280 @@
+
+#include <vector>
+#include <deque>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <map>
+#include <set>
+#include <algorithm>
+using namespace std;
+
+/*
+* Estrutura do Nó para a Árvore de Huffman
+*
+* */
+struct sNo
+{
+	sNo(sNo * lft = 0, sNo * rght = 0, char ASCI = 0, unsigned int frq = 0) :code()
+	{
+		esq = lft; dir = rght; ASCII = ASCI; freq = frq;
+	}
+	sNo(const sNo& outro)
+	{
+		esq = outro.esq; dir = outro.dir; ASCII = outro.ASCII; freq = outro.freq; code = outro.code;
+	}
+	sNo * esq;
+	sNo * dir;
+	char   ASCII;
+	unsigned int freq;
+	string code;
+};
+
+/**
+* Classe de comparacao para fazer min heap
+*/
+struct comp
+{
+	bool operator()(sNo* const prim, sNo* const seg)
+	{
+		return prim->freq>seg->freq;//Para fazer min heap
+	}
+};
+/**
+* Classe de comparaçao pra setar
+*/
+struct comp2
+{
+	bool operator()(sNo*  prim, sNo* seg)
+	{
+		return (unsigned int)(prim->ASCII)<(unsigned int)(seg->ASCII);
+	}
+};
+
+/**
+* Converte caracteres para 8 bit
+*/
+string ascii_bin(const char&c)
+{
+	string bin;
+	for (unsigned int y = 0; y < sizeof(char) * 8; y++)
+		bin.insert(bin.begin(), (c & (1 << y)) ? '1' : '0');
+	return bin;
+}
+
+/**
+* Le o char stream para bit stream usando o método anterior
+*/
+void bin_str(ifstream & ifs, deque<char> & ss)
+{
+	char aux = 0;
+	while (ifs.good())
+	{
+		aux = ifs.get(); if (!ifs.good()) break;
+		string  tmp = ascii_bin(aux);
+		ss.insert(ss.end(), tmp.data(), tmp.data() + tmp.length());
+	}
+}
+//Converte 8 bit pra char
+char bin_ascii(const char*c)
+{
+	char ascii = 0;
+	for (unsigned int y = 0; y <(sizeof(char) * 8) - 1; y++)
+		ascii = (ascii | (c[y] - 0x30)) << 1;
+	return (ascii | (c[7] - 0x30));
+}
+
+//Escreve bit stream pra arquivo
+void str_bin(deque<char> & ss, ofstream & of)
+{
+	while (ss.size()>0)
+	{
+		of << bin_ascii(&ss[0]);
+		ss.erase(ss.begin(), ss.begin() + 8);
+	}
+}
+
+//Escrever a árvore de Huffman para o arquivo e também fazer mapeamento de código
+void print(sNo*a, map<char, string> &encoder, deque<char> & ss)
+{
+	if (a->esq == 0)//Apenas esq e dir ligados na folha podem ser NULL
+	{
+		ss.push_back('1');
+		string  tmp = ascii_bin(a->ASCII);
+		ss.insert(ss.end(), tmp.data(), tmp.data() + tmp.length());
+		//cout<<a->ASCII<<" "<<a->freq<<endl;
+		encoder[a->ASCII] = a->code;
+	}
+	else
+	{
+		ss.push_back('0');
+		a->esq->code.append(a->code);
+		a->esq->code.append("0");
+		a->dir->code.append(a->code);
+		a->dir->code.append("1");
+		print(a->esq, encoder, ss);
+		print(a->dir, encoder, ss);
+	}
+}
+
+/**
+*  printando árvore
+*/
+void read(sNo*a, deque<char> & ss)
+{
+	char aux = ss.front(); ss.erase(ss.begin());
+	if (aux == '1')
+	{
+		string tmp(ss.begin(), ss.begin() + 8);
+		a->ASCII = bin_ascii(&tmp[0]);
+		ss.erase(ss.begin(), ss.begin() + 8);
+	}
+	else
+	{
+		a->esq = new sNo(0, 0, 0, 0);
+		a->dir = new sNo(0, 0, 0, 0);
+		if (a->esq == 0 || a->dir == 0) { cout << "Erro na alocacao de memoria!" << endl; exit(1); }
+		a->esq->code.append(a->code);
+		a->esq->code.append("0");
+		a->dir->code.append(a->code);
+		a->dir->code.append("1");
+		read(a->esq, ss);
+		read(a->dir, ss);
+	}
+}
+
+/*
+* decodifica o bit stream pra bytes.
+* recursivamente passa pela árvore até a folha.
+*/
+void read(sNo*a, deque<char> & ss, ofstream&of)
+{
+	if (a->esq == 0)
+	{
+		of << a->ASCII;
+	}
+	else
+	{
+		char aux = ss.front(); ss.erase(ss.begin());
+		if (aux == '0')
+			read(a->esq, ss, of);
+		else
+			read(a->dir, ss, of);
+	}
+}
+
+
+void compactar(char*filename, char*outname)
+{
+	ifstream ifs(filename, ifstream::in | ifstream::binary);
+	if (!ifs.is_open()) { cout << "Erro ao abrir o Arquivo!" << endl;  exit(1); }
+	set<sNo*, comp2> setarNo;//para encontrar a frequencia
+	vector<sNo*> lst; //segura o heap
+	while (ifs.good())//le o arquivo e colocar pra setar
+	{
+		char aux = ifs.get();  if (!ifs.good()) break;
+		sNo* cand = new sNo(0, 0, aux, 1);
+		if (cand == 0) { cout << "Erro na alocacao de memoria" << endl; exit(1); }
+		pair<set<sNo*>::iterator, bool> ret = setarNo.insert(cand);
+		if (!ret.second) {
+			delete cand;
+			(*(ret.first))->freq++;
+		}
+	}
+	for (set<sNo*>::iterator itr = setarNo.begin(); itr != setarNo.end(); itr++)
+	{//pra usar o heap, o push seta elementos no vector
+		lst.push_back(*itr);
+	}
+	setarNo.clear();
+	make_heap(lst.begin(), lst.end(), comp());
+	while (lst.size()>1)//retira os dois menores elementos do heap e da o push
+	{                  //of these nodes
+		pop_heap(lst.begin(), lst.end(), comp());
+		sNo* prim = lst.back(); lst.pop_back();
+		pop_heap(lst.begin(), lst.end(), comp());
+		sNo* seg = lst.back(); lst.pop_back();
+		sNo* pai = new sNo(prim, seg, 0, prim->freq + seg->freq);
+		if (pai == 0) { cout << "Erro na alocacao de memoria" << endl; exit(1); }
+		lst.push_back(pai);
+		push_heap(lst.begin(), lst.end(), comp());
+	}
+	deque<char> buffer;//buffer para manter o bit stream
+	map<char, string> encoder;//Mapeando a árvore de huffman
+	print(lst.front(), encoder, buffer);//Escreve a árvore pro arquivo e seta o mapeamento
+
+	ifs.close();
+	ifs.open(filename, ifstream::in | ifstream::binary);
+	if (!ifs.is_open()) { cout << "Erro ao abrir o arquivo" << endl;  exit(1); }
+	while (ifs.good())
+	{
+		char aux = ifs.get();  if (!ifs.good()) break;
+		string & tmp = encoder[aux];
+		buffer.insert(buffer.end(), tmp.data(), tmp.data() + tmp.length());
+	}
+	ofstream ofs(outname, ofstream::out | ifstream::binary);
+	if (!ofs.is_open()) { cout << "Erro ao escrever no arquivo" << endl;  exit(1); }
+	unsigned int length = buffer.size();
+	unsigned int menortamanho = (length / 8) * 8;
+	unsigned int preencher = length - menortamanho;
+	if (preencher != 0) preencher = 8 - preencher;
+	for (; preencher>0; preencher--)  buffer.push_back('0');//preencher
+	ofs.write((const char*)&length, sizeof(unsigned int));
+	str_bin(buffer, ofs);//write file
+	cout << "Arquivo codificado com sucesso!" << endl;
+	ofs.close();
+}
+
+
+void decoder(char*filename, char*outname)
+{
+	sNo* no = new sNo(0, 0, 0, 0);//huffman tree no
+	if (no == 0) { cout << "Erro na alocacao de memoria!" << endl; exit(1); }
+	deque<char> buffer; //buffer de '1's e '0's,
+	ifstream ifs(filename, ifstream::in | ifstream::binary);
+	if (!ifs.is_open()) { cout << "file open error!" << endl;  exit(1); }
+	unsigned int size; //tamanho comprimido
+	ifs.read((char*)& size, sizeof(unsigned int));
+	unsigned int menortamanho = (size / 8) * 8;
+	unsigned int preencher = size - menortamanho;
+	if (preencher != 0) preencher = 8 - preencher;
+	bin_str(ifs, buffer);//le todo o buffer do arquivo, convertendo para bits
+
+	for (; preencher>0; preencher--)  buffer.erase(buffer.end());//rle o preenchimento de 0's
+
+	ofstream ofs(outname, ofstream::out | ofstream::binary);
+	if (!ofs.is_open()) { cout << "Erro ao escrever no arquivo!" << endl;  exit(1); }
+
+	read(no, buffer);//le árvore
+
+	while (buffer.size()>0)//decodifica e escreve arquivo como lido da árvore.
+		read(no, buffer, ofs);
+}
+
+/**
+* Se virem com os argumentos.
+*/
+int main(int argc, char**argv) {
+	if (argc == 4 && argv[1][0] == '-')
+	{
+		if (argv[1][1] == 'e')
+		{
+			compactar(argv[2], argv[3]);
+		}
+		else if (argv[1][1] == 'd')
+		{
+			decoder(argv[2], argv[3]);
+		}
+		else
+		{
+			cout << "Argumentos Invalidos!" << endl;
+			return 1;
+		}
+
+	}
+	else {
+		cout << "Argumentos Invalidos!" << endl;
+		return 1;
+	}
+	return 0;
+}
