@@ -52,6 +52,13 @@ int altura(sNo *a);
 int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
+
+// int main(int argC, char *argV[])
+// if argC < 3 sair erro
+// argV[1] vai ter o -c ou -d
+// argV[2] vair ter o arq .txt
+// argV[3] o arq de saida
+// huff -c bla.txt bla.huf
 int main() {
 	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, b;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
@@ -99,24 +106,24 @@ int main() {
 	(vn + (k - 1))->esq = NULL;
 	(vn + (k - 1))->freq = NULL;
 	apontaVetor(va, vn);
-	for (a = 0; a > 150; a++) {
-		(simbolo + a)->c = '$';
-	}
-
 	
 	ordenaVetorp(va);
 	printf("caracter e freq:\n\n");
 	printVetorp(va);
+	printf("\n\n");
 
 	montaArvore(va);
 	criaTabela(simbolo, va[0], 0, s, &j);
-	pri
+	printf("textual arvore:\n\n");
 	imprime_textual(va[0]);
-	printf("\n");
+	printf("\n\n");
+	printf("tabela de Simbolo:\n");
 	printTabela(simbolo, va);
-
+	printf("\n\n");
+	printf("texto em binario:\n");
 	rewind(file);
 	int h = 0;
+	
 	do {
 		c = fgetc(file);
 		for (int q = 0; q < checktam(va); q++) {
@@ -129,13 +136,15 @@ int main() {
 				a = 0;
 			}
 		}
-	} while (c != EOF);
 
+	} while (c != EOF);
+	
+	
 
 
 	for (int v = 0; v < 1000; v++) {
 		if (textob[v] == '0' || textob[v] == '1')
-			printf("%c", textob[v]);
+		printf("%c", textob[v]);
 	}
 
 	int y = 0;
@@ -159,15 +168,15 @@ int main() {
 
 	fprintf(file2, "JGL\n");
 	for (int i = 0; i < y; i++) {
-		fprintf(file2, "%c ", textoInt[i]);
+		fprintf(file2, "%c", textoInt[i]);
 	}
 	fprintf(file2, "\n");
 	imprime_textualf(va[0], file2);
-
-
-
-
-
+	int i = 0;
+	while ((simbolo + j)->sim[i] == '0' || (simbolo + j)->sim[i] == '1') {
+		i++;
+	}
+	
 
 	printf("\n");
 	fclose(file);
@@ -488,7 +497,7 @@ int bin_to_dec(int bin)
 		bin = bin / 10;
 		potenc = potenc * 2;
 
-		fprintf(stderr, "while\n");
+		
 	}
 
 	return total;
