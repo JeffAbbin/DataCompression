@@ -43,21 +43,29 @@ void printVetorp(struct sNo *vetor[]);
 void ordenaVetorp(struct sNo *vetor[]);
 void montaArvore(struct sNo *vetorp[]);
 void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *s, int *j);
-void printTabela(struct simbolo *simb);
+void printTabela(struct simbolo *simb, struct sNo *vetorp[]);
 int checktam(struct sNo *vetorp[]);
-
+int bin_to_dec(int bin);
+void imprime_textualf(sNo *a, FILE *file);
+int descompactar(FILE *file);
 int altura(sNo *a);
 int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
 
+
+// int main(int argC, char *argV[])
+// if argC < 3 sair erro
+// argV[1] vai ter o -c ou -d
+// argV[2] vair ter o arq .txt
+// argV[3] o arq de saida
+// huff -c bla.txt bla.huf
 int main() {
-	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0;
+	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, b;
 	sNo *a0, *a1, *a2, *a3, *a4, *a5;
-	FILE *file;
-	char c, aux, ch, string[150], *s, textob[1000];
+	FILE *file, *file2, *file3;
+	char c, aux, ch, string[150], *s, textob[1000], byte[8], textoInt[1000];
 	struct sNo *p, vn[255], *va[255], *vp;
 	struct simbolo simbolo[150];
-	FILE *input, *output;
 	vp = vn;
 	jp = &j;
 
@@ -65,7 +73,7 @@ int main() {
 
 	inicilizaVetor(vp);
 
-	file = fopen("C:\\Users\\gigio\\Desktop\\dataCpmpression\\ConsoleApplication1\\ConsoleApplication1\\Teste.txt", "r");
+	file = fopen("C:\\Temp\\test.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
@@ -99,19 +107,23 @@ int main() {
 	(vn + (k - 1))->freq = NULL;
 	apontaVetor(va, vn);
 
-	printf("\n");
 	ordenaVetorp(va);
-
+	printf("caracter e freq:\n\n");
 	printVetorp(va);
+	printf("\n\n");
 
 	montaArvore(va);
 	criaTabela(simbolo, va[0], 0, s, &j);
+	printf("textual arvore:\n\n");
 	imprime_textual(va[0]);
-	printf("\n");
-	printTabela(simbolo);
-
+	printf("\n\n");
+	printf("tabela de Simbolo:\n");
+	printTabela(simbolo, va);
+	printf("\n\n");
+	printf("texto em binario:\n");
 	rewind(file);
 	int h = 0;
+
 	do {
 		c = fgetc(file);
 		for (int q = 0; q < checktam(va); q++) {
@@ -124,151 +136,74 @@ int main() {
 				a = 0;
 			}
 		}
+
 	} while (c != EOF);
 
+
+
 	for (int v = 0; v < 1000; v++) {
-		printf("%c", textob[v]);
+		if (textob[v] == '0' || textob[v] == '1')
+			printf("%c", textob[v]);
 	}
+
+	printf("\n\nbyte de saida em hexadecimal:\n");
+
+
+	int y = 0;
+	b = 0;
+	while (textob[b] == '0' || textob[b] == '1') {
+		for (int i = 0; i < 8; i++) {
+			byte[i] = textob[b];
+			b++;
+		}
+		bin = atol(byte);
+		
+		textoInt[y] = bin_to_dec(bin);
+		printf("%x ", bin_to_dec(bin));
+
+		y++;
+	}
+
+	file2 = fopen("C:\\Temp\\testcompact.txt", "w");
+	if (file == NULL) {
+		printf("Erro - nao foi possivel ler arquivo\n");
+		return 0;
+	}
+
+	fprintf(file2, "JGL\n");
+	for (int i = 0; i < y; i++) {
+		fprintf(file2, "%c", textoInt[i]);
+	}
+	fprintf(file2, "\n");
+	imprime_textualf(va[0], file2);
+	int i = 0;
+	while ((simbolo + j)->sim[i] == '0' || (simbolo + j)->sim[i] == '1') {
+		i++;
+	}
+
+	printf("\n");
+
+	file3 = fopen("C:\\Temp\\testcompact.txt", "r");
+	if (file == NULL) {
+		printf("Erro - nao foi possivel ler arquivo\n");
+		return 0;
+	}
+
+	descompactar(file3);
 
 
 
 
 	printf("\n");
 	fclose(file);
-
-	printf("Digite o nome do arquivo a ser compactado:n");
-	scanf("%s", filename);
-	printf("1 - Comprimir /n2 - Descomprimir:n");
-	scanf("%d", &compress);
-
-
-	input = fopen(filename, "r");
-	output = fopen("output.txt", "w");
-
-	if (compress == 1)
-		compressFile(input, output, codeTable2);
-	else
-		decompressFile(input, output, tree);
+	fclose(file2);
+	fclose(file3);
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/*
-	sNo *a0, *a1, *a2, *a3, *a4, *a5; // exemplo 1
-	sNo *a10; // exemplo 2
-	sNo *a20; // exemplo 3: arvore com um unico no raiz
-	sNo *a30; // exemplo 4: para exemplo de arvore vazia
-	int r, v;
-
-	/*  Exemplo 1 ------------------------------------------------------------------------
-	Criando a seguinte arvore:
-	0
-	/   \
-	1    2
-	\   / \
-	3 4   5
-
-	a3 = cria(3, inicializa(), inicializa(), &r);
-	a4 = cria(4, inicializa(), inicializa(), &r);
-	a5 = cria(5, inicializa(), inicializa(), &r);
-	a1 = cria(1, inicializa(), a3, &r);
-	a2 = cria(2, a4, a5, &r);
-	a0 = cria(0, a1, a2, &r);
-	if (r) {
-	printf(":: Arvore a0 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a0);
-	printf("\n:: In-order: ");
-	imprime_in_order(a0);
-	printf("\n:: Pos-order: ");
-	imprime_pos_order(a0);
-	printf("\n:: Textual: ");
-	imprime_textual(a0);
-	printf("\n:: a0 possui %d nos", qtdeNos(a0));
-	printf("\n:: a0 possui %d folhas", qtdeFolhas(a0));
-	printf("\n:: a0 possui altura de %d \n", altura(a0));
-
-	getch();
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-
-
-	/* Exemplo 2 -----------------------------------------------------------------------------
-	Outro exemplo de arvore e formato para criacao:
-	21
-	/   \
-	20   21
-
-	a10 = cria(10,cria(20, NULL, NULL, &r),cria(21, NULL, NULL, &r),&r);
-	if (r) {
-	printf("\n\n:: Arvore a10 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a10);
-	printf("\n:: Textual: ");
-	imprime_textual(a10);
-	printf("\n:: a10 possui %d nos", qtdeNos(a10));
-	printf("\n:: a10 possui %d folhas", qtdeFolhas(a10));
-	printf("\n:: a10 possui altura de %d \n", altura(a10));
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-
-
-	// Exemplo do usa da funcao de busca -----------------------------------------------------
-	if (busca(4, a0)) printf("\n\nValor 4 esta presente na arvore a0\n");
-	if (!busca(4, a10)) printf("Valor 4 nao esta presente na arvore a10\n");
-	getch();
-
-	// Exemplo 3 -----------------------------------------------------------------------------
-	// arvore com um unico no raiz
-	a20 = cria(20, inicializa(), inicializa(), &r);
-	if (r) {
-	printf("\n\n:: Arvore a20 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a20);
-	printf("\n:: Textual: ");
-	imprime_textual(a20);
-	printf("\n:: a0 possui %d nos", qtdeNos(a20));
-	printf("\n:: a0 possui %d folhas", qtdeFolhas(a20));
-	printf("\n:: a0 possui altura de %d \n", altura(a20));
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-
-
-	// Exemplo 4 ---------------------------------------------------------------------------
-	// Arvore vazia
-	a30 = inicializa();
-	if (r) {
-	printf("\n\n:: Arvore a30 criada!");
-	printf("\n:: Pre-order: ");
-	imprime_pre_order(a30);
-	printf("\n:: Textual: ");
-	imprime_textual(a30);
-	printf("\n:: a0 possui %d nos", qtdeNos(a30));
-	printf("\n:: a0 possui %d folhas", qtdeFolhas(a30));
-	printf("\n:: a0 possui altura de %d \n", altura(a30));
-	}
-	else printf("=> Erro na criacao da arvore!\n");
-	return 0;
-	*/
 }
-
-// definicao recursiva de arvore binaria:
 // 1) uma arvore binaria eh vazia, ou
 sNo *inicializa(void) {
 	return NULL;
@@ -341,10 +276,21 @@ void imprime_textual(sNo *a) {
 	if (e_vazia(a))
 		printf("<>");
 	else {
-		printf("<%c", a->carcter);
+		printf("<%c/%d", a->carcter, a->freq);
 		imprime_textual(a->esq);
 		imprime_textual(a->dir);
 		printf(">");
+	}
+}
+
+void imprime_textualf(sNo *a, FILE *file) {
+	if (e_vazia(a))
+		fprintf(file, "<>");
+	else {
+		fprintf(file, "<%c/%d", a->carcter, a->freq);
+		imprime_textualf(a->esq, file);
+		imprime_textualf(a->dir, file);
+		fprintf(file, ">");
 	}
 }
 
@@ -533,17 +479,19 @@ void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *string, int
 	}
 }
 
-void printTabela(struct simbolo *simb) {
+void printTabela(struct simbolo *simb, struct sNo *vetorp[]) {
 	int i = 0;
-	for (int j = 0; j < 150; j++) {
+	for (int j = 0; j < checktam(vetorp); j++) {
+
 		printf("%c   ", (simb + j)->c);
-		while (simb->sim[i] != '\0') {
+		while ((simb + j)->sim[i] == '0' || (simb + j)->sim[i] == '1') {
 			printf("%c", (simb + j)->sim[i]);
 			i++;
 		}
 		printf("\n");
 		i = 0;
 	}
+
 }
 
 int checktam(struct sNo *vetorp[]) {
@@ -557,58 +505,31 @@ int checktam(struct sNo *vetorp[]) {
 		}
 	}
 	return j;
+}
+int bin_to_dec(int bin)
+{
+	int total = 0;
+	int potenc = 1;
 
-	void decompressFile(FILE *input, FILE *output, sNo *a0) {
-		sNo *a1 = a0;
-		char c, bit;
-		char mask = 1 << 7;
-		int i;
-
-		while ((c = fgetc(input)) != EOF) {
-
-			for (i = 0; i<8; i++) {
-				bit = c & mask;
-				c = c << 1;
-				if (bit == 0) {
-					a1 = a1->esq;
-					if (a1->caracter != 127) {
-						if (a1->caracter == 26)
-							fputc(32, output);
-						else
-							fputc(a1->caracter + 97, output);
-						a1 = a0;
-					}
-				}
-
-				else {
-					a1 = a1->dir;
-					if (a1->caracter != 127) {
-						if (a1->caracter == 26)
-							fputc(32, output);
-						else
-							fputc(a1->caracter + 97, output);
-						a1 = a0;
-					}
-				}
-			}
-		}
-
-		return;
+	while (bin > 0) {
+		total += bin % 10 * potenc;
+		bin = bin / 10;
+		potenc = potenc * 2;
 	}
 
-	/*void inverteCodigos(int tabelaCodigo[], int tabelaCodigo2[]) {
-		int i, n, copia;
+	return total;
+}
 
-		for (i = 0; i<27; i++) {
-			n = tabelaCodigo[i];
-			copia = 0;
-			while (n>0) {
-				copia = copia * 10 + n % 10;
-				n /= 10;
-			}
-			tabelaCodigo2[i] = copia;
-		}
+int descompactar(FILE *file) {
+	char c, id[3];
+		fscanf(file, id);
+	if (strcmp(id, "JGL") == 0) {
+		printf("esse nao é uma arquivo compactado\n");
+		return ERRO;
+	}
 
-		return;
-	}*/
+
+	c = fgetc(file);
+	printf("%c", c);
+	return OK;
 }
