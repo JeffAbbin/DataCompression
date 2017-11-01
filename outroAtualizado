@@ -73,7 +73,7 @@ int main() {
 
 	inicilizaVetor(vp);
 
-	file = fopen("C:\\Temp\\test.txt", "r");
+	file = fopen("C:\\Users\\jefferson.abbin\\Documents\\test.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
@@ -157,14 +157,14 @@ int main() {
 			b++;
 		}
 		bin = atol(byte);
-		
+
 		textoInt[y] = bin_to_dec(bin);
 		printf("%x ", bin_to_dec(bin));
 
 		y++;
 	}
 
-	file2 = fopen("C:\\Temp\\testcompact.txt", "w");
+	file2 = fopen("C:\\Users\\jefferson.abbin\\Documents\\testcompact.txt", "w");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
@@ -180,10 +180,12 @@ int main() {
 	while ((simbolo + j)->sim[i] == '0' || (simbolo + j)->sim[i] == '1') {
 		i++;
 	}
+	fclose(file);
+	fclose(file2);
 
 	printf("\n");
 
-	file3 = fopen("C:\\Temp\\testcompact.txt", "r");
+	file3 = fopen("C:\\Users\\jefferson.abbin\\Documents\\testcompact.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
@@ -195,8 +197,7 @@ int main() {
 
 
 	printf("\n");
-	fclose(file);
-	fclose(file2);
+	
 	fclose(file3);
 
 
@@ -522,14 +523,15 @@ int bin_to_dec(int bin)
 
 int descompactar(FILE *file) {
 	char c, id[3];
-		fscanf(file, id);
-	if (strcmp(id, "JGL") == 0) {
+	for (int i = 0;i < 3;i++) {
+		c = fgetc(file);
+		id[i] = c;
+	}
+	if (id[0] != 'J'|| id[1] != 'G'|| id[2] != 'L') {
 		printf("esse nao é uma arquivo compactado\n");
 		return ERRO;
 	}
 
-
-	c = fgetc(file);
 	printf("%c", c);
 	return OK;
 }
