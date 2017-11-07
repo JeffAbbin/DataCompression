@@ -57,6 +57,7 @@ void fprintTabela(struct simbolo *simb, struct sNo *vetorp[], FILE *file);
 int tamBits(struct simbolo *simb);
 bool comparador(char s1[], char s2[]);
 void vetorNULL(char *g);
+int contaBits(struct simbolo *simb, struct sNo *a);
 
 
 // int main(int argC, char *argV[])
