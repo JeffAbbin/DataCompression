@@ -47,10 +47,16 @@ void printTabela(struct simbolo *simb, struct sNo *vetorp[]);
 int checktam(struct sNo *vetorp[]);
 int bin_to_dec(int bin);
 void imprime_textualf(sNo *a, FILE *file);
-int descompactar(FILE *file);
+int descompactar(FILE *file, struct simbolo *simb, struct sNo *vetorp[]);
 int altura(sNo *a);
 int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
+int checkBits(char *byte);
+void inicializarByte(char *byte);
+void fprintTabela(struct simbolo *simb, struct sNo *vetorp[], FILE *file);
+int tamBits(struct simbolo *simb);
+bool comparador(char s1[], char s2[]);
+void vetorNULL(char *g);
 
 
 // int main(int argC, char *argV[])
@@ -65,7 +71,7 @@ int main() {
 	FILE *file, *file2, *file3;
 	char c, aux, ch, string[150], *s, textob[1000], byte[8], textoInt[1000];
 	struct sNo *p, vn[255], *va[255], *vp;
-	struct simbolo simbolo[150];
+	struct simbolo simbolo[150], simbD[150];
 	vp = vn;
 	jp = &j;
 
@@ -73,17 +79,12 @@ int main() {
 
 	inicilizaVetor(vp);
 
-	file = fopen("C:\\Users\\jefferson.abbin\\Documents\\test.txt", "r");
+	file = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\test.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
 	}
-	
-	do {
-		c = fgetc(file);
-		printf("%c", c);
-	} while (c != EOF);
-
+	 
 	do {
 		c = fgetc(file);
 		if (checkVetor(c, vp) == DIF) {
@@ -169,7 +170,7 @@ int main() {
 		y++;
 	}
 
-	file2 = fopen("C:\\Users\\jefferson.abbin\\Documents\\testcompact.txt", "w");
+	file2 = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\testcompact.txt", "w");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
@@ -180,7 +181,7 @@ int main() {
 		fprintf(file2, "%c", textoInt[i]);
 	}
 	fprintf(file2, "\n");
-	imprime_textualf(va[0], file2);
+	fprintTabela(simbolo, va, file2);
 	int i = 0;
 	while ((simbolo + j)->sim[i] == '0' || (simbolo + j)->sim[i] == '1') {
 		i++;
@@ -190,19 +191,19 @@ int main() {
 
 	printf("\n");
 
-	file3 = fopen("C:\\Users\\jefferson.abbin\\Documents\\testcompact.txt", "r");
+	file3 = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\testcompact.txt", "r");
 	if (file == NULL) {
 		printf("Erro - nao foi possivel ler arquivo\n");
 		return 0;
 	}
 
-	descompactar(file3);
+	descompactar(file3, simbD,va);
 
 
 
 
-	printf("\n");
-	
+	//printf("\n");
+
 	fclose(file3);
 
 
@@ -489,12 +490,26 @@ void printTabela(struct simbolo *simb, struct sNo *vetorp[]) {
 	int i = 0;
 	for (int j = 0; j < checktam(vetorp); j++) {
 
-		printf("%c   ", (simb + j)->c);
+		printf("%c ", (simb + j)->c);
 		while ((simb + j)->sim[i] == '0' || (simb + j)->sim[i] == '1') {
 			printf("%c", (simb + j)->sim[i]);
 			i++;
 		}
 		printf("\n");
+		i = 0;
+	}
+
+}
+void fprintTabela(struct simbolo *simb, struct sNo *vetorp[], FILE *file) {
+	int i = 0;
+	for (int j = 0; j < checktam(vetorp); j++) {
+
+		fprintf(file,"%c ", (simb + j)->c);
+		while ((simb + j)->sim[i] == '0' || (simb + j)->sim[i] == '1') {
+			fprintf(file,"%c", (simb + j)->sim[i]);
+			i++;
+		}
+		fprintf(file,"\n");
 		i = 0;
 	}
 
@@ -526,17 +541,157 @@ int bin_to_dec(int bin)
 	return total;
 }
 
-int descompactar(FILE *file) {
-	char c, id[3];
-	for (int i = 0;i < 3;i++) {
+int descompactar(FILE *file, struct simbolo *simb, struct sNo *vetorp[]) {
+	unsigned char c, id[3];
+	char byte[8], byte2[8], bit[1000];
+	unsigned int h, p,x,y=0, m=0, o=0;
+	FILE *file2;
+	inicializarByte(byte2);
+	for (int i = 0; i < 3; i++) {
 		c = fgetc(file);
 		id[i] = c;
 	}
-	if (id[0] != 'J'|| id[1] != 'G'|| id[2] != 'L') {
+	if (id[0] != 'J' || id[1] != 'G' || id[2] != 'L') {
 		printf("esse nao é uma arquivo compactado\n");
 		return ERRO;
 	}
+	fgetc(file);
+	c = fgetc(file);
+	do {
+		p = 7;
+		inicializarByte(byte2);
+		h = c;
+		itoa(h, byte, 2);
 
-	printf("%c", c);
+		for (int j = 0; j < checkBits(byte)+1; j++) {
+			x = checkBits(byte) - j;
+			byte2[p] = byte[x];
+			p--;
+		}
+		printf("%c%s\n", c, byte2);
+		c = fgetc(file);
+		if (c != '\n') {
+			for (int z = 0; z < 8; z++) {
+				bit[y] = byte2[z];
+				y++;
+			}
+		}
+
+		
+
+	} while (c != '\n');
+	for (int z = 0; z < 8; z++) {
+		bit[y] = byte[z];
+		y++;
+	}
+	c = fgetc(file);
+	do {
+		
+		(simb+o)->c = c;
+		c = fgetc(file);
+		c = fgetc(file);
+		do {
+			(simb + o)->sim[m] = c;
+			m++;
+			c = fgetc(file);
+		} while (c != '\n' );
+		(simb + o)->sim[m] = '\0';
+		c = fgetc(file);
+		m = 0;
+		o++;
+	}while (c != 255);
+
+	file2 = fopen("C:\\Users\\abbin\\Documents\\engenharia\\programaçao\\compactação\\testdescompact.txt", "w");
+	if (file == NULL) {
+		printf("Erro - nao foi possivel ler arquivo\n");
+		return 0;
+	}
+
+	char g[255], *gp;
+	gp = g;
+	int tam, u, v=0, vAnt=0, loop= 0,d=1;
+	while (loop == 0) {
+		for (int i = 0; i < checktam(vetorp); i++) {
+			tam = tamBits(simb + i) + 1;
+			for (u = 0; u < tam; u++) {
+				g[u] = bit[v];
+				v++;
+			}
+			g[u] = '\0';
+			if (comparador(g, (simb + i)->sim) == 0) {
+				v = vAnt;
+			}
+			else {
+				fprintf(file2, "%c", (simb + i)->c);
+				printf("%c", (simb + i)->c);
+				if (bit[v-1] == '\0') {
+					fclose(file2);
+					return 1;
+				}
+				v = v + tam - d;
+				d++;
+				vAnt = v;
+			}
+			vetorNULL(gp);
+		
+
+
+		}
+		printf("se fudeu");
+	}
+
+	
+	
+
+	
+
+	printf("%c\n", c);
+	printf("%s\n", bit);
 	return OK;
+
+}
+
+void inicializarByte(char *byte){
+	for (int i = 0; i < 8; i++) {
+		byte[i] = '0';
+}
+
+}
+
+int checkBits(char *byte) {
+	int i = 0;
+	do {
+		i++;
+	} while (byte[i] != '\0');
+		return i - 1;
+}
+
+int tamBits(struct simbolo *simb) {
+	int i = 0;
+	do {
+		i++;
+	} while (simb->sim[i] != '\0');
+	return i - 1;
+
+}
+
+
+bool comparador(char s1[], char s2[]) {
+	int i = 0;
+	while (s1[i] == s2[i] && s1[i] != '\0' && s2[i] != '\0') {
+		i++;
+	}
+
+	if (s1[i] == '\0' && s2[i] == '\0') {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+void vetorNULL(char *g) {
+	for (int x = 0; x < 255; x++) {
+		g[x] = NULL;
+	}
 }
