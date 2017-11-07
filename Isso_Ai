@@ -139,7 +139,12 @@ int main(int argC, char *argV[]) {
 		batata = contaBits(simbolo, vp);
 		printf("Total de bits: %d", batata);
 		printf("\n");
-
+		
+		do {
+ 			c = fgetc(file);
+ 			printf("%c", c);
+ 		} while (c != EOF);
+		
 		do {
 			c = fgetc(file);
 			for (int q = 0; q < checktam(va); q++) {
