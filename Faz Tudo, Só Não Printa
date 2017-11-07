@@ -47,10 +47,17 @@ void printTabela(struct simbolo *simb, struct sNo *vetorp[]);
 int checktam(struct sNo *vetorp[]);
 int bin_to_dec(int bin);
 void imprime_textualf(sNo *a, FILE *file);
-
+int descompactar(FILE *file, struct simbolo *simb, struct sNo *vetorp[], FILE *file2);
 int altura(sNo *a);
 int qtdeNos(sNo *a);
 int qtdeFolhas(sNo *a);
+int checkBits(char *byte);
+void inicializarByte(char *byte);
+void fprintTabela(struct simbolo *simb, struct sNo *vetorp[], FILE *file);
+int tamBits(struct simbolo *simb);
+bool comparador(char s1[], char s2[]);
+void vetorNULL(char *g);
+int contaBits(struct simbolo *simb, struct sNo *a);
 
 
 // int main(int argC, char *argV[])
@@ -61,23 +68,21 @@ int qtdeFolhas(sNo *a);
 // huff -c bla.txt bla.huf
 int main(int argC, char *argV[]) {
 	if (argC < 3) {
-		printf("Parametros Invalidos");
-		return -1;
+		printf("Parametros invalidos");
 	}
+	
+	int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, b;
+	sNo *a0, *a1, *a2, *a3, *a4, *a5;
+	FILE *file, *file2, *file3, *file4;
+	char c, aux, ch, string[150], *s, textob[1000], byte[8], textoInt[1000];
+	struct sNo *p, vn[255], *va[255], *vp;
+	struct simbolo simbolo[150], simbD[150];
+	vp = vn;
+	jp = &j;
+
+	s = string;
+
 	if (strcmp(argV[1], "-c") == 0) {
-
-
-		int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, b;
-		sNo *a0, *a1, *a2, *a3, *a4, *a5;
-		FILE *file, *file2, *file3;
-		char c, aux, ch, string[150], *s, textob[1000], byte[8], textoInt[1000];
-		struct sNo *p, vn[255], *va[255], *vp;
-		struct simbolo simbolo[150];
-		vp = vn;
-		jp = &j;
-
-		s = string;
-
 		inicilizaVetor(vp);
 
 		file = fopen(argV[2], "r");
@@ -131,6 +136,8 @@ int main(int argC, char *argV[]) {
 		rewind(file);
 		int h = 0;
 
+		contaBits(simbolo, vn);
+
 		do {
 			c = fgetc(file);
 			for (int q = 0; q < checktam(va); q++) {
@@ -148,11 +155,13 @@ int main(int argC, char *argV[]) {
 
 
 
-
 		for (int v = 0; v < 1000; v++) {
 			if (textob[v] == '0' || textob[v] == '1')
 				printf("%c", textob[v]);
 		}
+
+		printf("\n\nbyte de saida em hexadecimal:\n");
+
 
 		int y = 0;
 		b = 0;
@@ -162,14 +171,16 @@ int main(int argC, char *argV[]) {
 				b++;
 			}
 			bin = atol(byte);
+
 			textoInt[y] = bin_to_dec(bin);
+			printf("%x ", bin_to_dec(bin));
 
 			y++;
 		}
 
 		file2 = fopen(argV[3], "w");
 		if (file == NULL) {
-			printf("Erro - nao foi possivel escrever no arquivo\n");
+			printf("Erro - nao foi possivel ler arquivo\n");
 			return 0;
 		}
 
@@ -178,41 +189,42 @@ int main(int argC, char *argV[]) {
 			fprintf(file2, "%c", textoInt[i]);
 		}
 		fprintf(file2, "\n");
-		imprime_textualf(va[0], file2);
+		fprintTabela(simbolo, va, file2);
 		int i = 0;
 		while ((simbolo + j)->sim[i] == '0' || (simbolo + j)->sim[i] == '1') {
 			i++;
 		}
-
-
-		printf("\n");
 		fclose(file);
 		fclose(file2);
+
+		printf("\n");
 	}
+
 	if (strcmp(argV[1], "-d") == 0) {
 
-		FILE *file3, *file4;
 		file3 = fopen(argV[2], "r");
-		char id[2];
-		if (file3 == NULL) {
+		if (file == NULL) {
 			printf("Erro - nao foi possivel ler arquivo\n");
 			return 0;
 		}
-		if (strcmp(id, "JGL") == 0)
-		{
-			printf("Arquivo Correto");
-		}
-		fclose(file3);
+
 		file4 = fopen(argV[3], "w");
-		if (file3 == NULL) {
-			printf("Erro - não foi possivel escrever no arquivo");
-		}
-		else {
-			fprintf(file3, "HEHE");
+		if (file == NULL) {
+			printf("Erro - nao foi possivel ler arquivo\n");
+			return 0;
 		}
 
+
+
+		descompactar(file3, simbD, va, file4);
+
+
+		fclose(file3);
+		fclose(file4);
+
+
 	}
-	
+
 
 }
 // 1) uma arvore binaria eh vazia, ou
@@ -494,12 +506,26 @@ void printTabela(struct simbolo *simb, struct sNo *vetorp[]) {
 	int i = 0;
 	for (int j = 0; j < checktam(vetorp); j++) {
 
-		printf("%c   ", (simb + j)->c);
+		printf("%c ", (simb + j)->c);
 		while ((simb + j)->sim[i] == '0' || (simb + j)->sim[i] == '1') {
 			printf("%c", (simb + j)->sim[i]);
 			i++;
 		}
 		printf("\n");
+		i = 0;
+	}
+
+}
+void fprintTabela(struct simbolo *simb, struct sNo *vetorp[], FILE *file) {
+	int i = 0;
+	for (int j = 0; j < checktam(vetorp); j++) {
+
+		fprintf(file, "%c ", (simb + j)->c);
+		while ((simb + j)->sim[i] == '0' || (simb + j)->sim[i] == '1') {
+			fprintf(file, "%c", (simb + j)->sim[i]);
+			i++;
+		}
+		fprintf(file, "\n");
 		i = 0;
 	}
 
@@ -527,5 +553,175 @@ int bin_to_dec(int bin)
 		bin = bin / 10;
 		potenc = potenc * 2;
 	}
+
 	return total;
 }
+
+int descompactar(FILE *file, struct simbolo *simb, struct sNo *vetorp[], FILE *file2) {
+	unsigned char c, id[3];
+	char byte[8], byte2[8], bit[1000];
+	unsigned int h, p, x, y = 0, m = 0, o = 0;
+	
+	inicializarByte(byte2);
+	for (int i = 0; i < 3; i++) {
+		c = fgetc(file);
+		id[i] = c;
+	}
+	if (id[0] != 'J' || id[1] != 'G' || id[2] != 'L') {
+		printf("esse nao é uma arquivo compactado\n");
+		return ERRO;
+	}
+	fgetc(file);
+	c = fgetc(file);
+	do {
+		p = 7;
+		inicializarByte(byte2);
+		h = c;
+		itoa(h, byte, 2);
+
+		for (int j = 0; j < checkBits(byte) + 1; j++) {
+			x = checkBits(byte) - j;
+			byte2[p] = byte[x];
+			p--;
+		}
+		printf("%c%s\n", c, byte2);
+		c = fgetc(file);
+		if (c != '\n') {
+			for (int z = 0; z < 8; z++) {
+				bit[y] = byte2[z];
+				y++;
+			}
+		}
+
+
+
+	} while (c != '\n');
+	for (int z = 0; z < 8; z++) {
+		bit[y] = byte[z];
+		y++;
+	}
+	c = fgetc(file);
+	do {
+
+		(simb + o)->c = c;
+		c = fgetc(file);
+		c = fgetc(file);
+		do {
+			(simb + o)->sim[m] = c;
+			m++;
+			c = fgetc(file);
+		} while (c != '\n');
+		(simb + o)->sim[m] = '\0';
+		c = fgetc(file);
+		m = 0;
+		o++;
+	} while (c != 255);
+
+	
+
+	char g[255], *gp;
+	gp = g;
+	int tam, u, v = 0, vAnt = 0, loop = 0, d = 1;
+	while (loop == 0) {
+		vetorNULL(gp);
+		for (int i = 0; i < checktam(vetorp); i++) {
+			tam = tamBits(simb + i) + 1;
+			for (u = 0; u < tam; u++) {
+				g[u] = bit[v];
+				v++;
+			}
+			g[u] = '\0';
+			if (comparador(g, (simb + i)->sim) == 0) {
+				v = vAnt;
+			}
+			else {
+				fprintf(file2, "%c", (simb + i)->c);
+				if (bit[v] == '\0') {
+					
+					return 1;
+				}
+				vAnt = v;
+			}
+
+			if (comparador(g, (simb + i)->sim) == 0) {
+
+			}
+			else {
+				break;
+			}
+			vetorNULL(gp);
+		}
+	}
+
+
+
+
+
+
+	printf("%c\n", c);
+	printf("%s\n", bit);
+	return OK;
+
+}
+
+void inicializarByte(char *byte) {
+	for (int i = 0; i < 8; i++) {
+		byte[i] = '0';
+	}
+
+}
+
+int checkBits(char *byte) {
+	int i = 0;
+	do {
+		i++;
+	} while (byte[i] != '\0');
+	return i - 1;
+}
+
+int tamBits(struct simbolo *simb) {
+	int i = 0;
+	do {
+		i++;
+	} while (simb->sim[i] != '\0');
+	return i - 1;
+
+}
+
+
+bool comparador(char s1[], char s2[]) {
+	int i = 0;
+	while (s1[i] == s2[i] && s1[i] != '\0' && s2[i] != '\0') {
+		i++;
+	}
+
+	if (s1[i] == '\0' && s2[i] == '\0') {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+void vetorNULL(char *g) {
+	for (int x = 0; x < 255; x++) {
+		g[x] = NULL;
+	}
+}
+
+int contaBits(struct simbolo *simb, struct sNo *a) {
+	int j = 0, quant, numBits, f = 0;
+	char caracter;
+	quant = qtdeFolhas(a);
+	do {
+		for (j = 0; j <= quant; j++) {
+			if ((a + f)->carcter == (simb + j)->c) {
+				numBits = tamBits(simb + j) * (a + f)->freq;
+				printf("%c %d -> %d acumulado %d", (simb + j)->c, (a + f)->freq, tamBits, numBits);
+			}
+		}
+		f++;
+	} while (f < quant);
+	return 0;
+}
+
