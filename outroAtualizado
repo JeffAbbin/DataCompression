@@ -129,6 +129,8 @@ int main() {
 	printf("texto em binario:\n");
 	rewind(file);
 	int h = 0;
+	
+	contaBits(simbolo, vn);
 
 	do {
 		c = fgetc(file);
@@ -699,3 +701,19 @@ void vetorNULL(char *g) {
 		g[x] = NULL;
 	}
 }
+
+int contaBits(struct simbolo *simb, struct sNo *a) {
+	int j = 0, quant, numBits, f=0;
+	char caracter;
+	quant = qtdeFolhas(a);
+	do {
+		for (j = 0; j <= quant; j++) {
+			if ((a+f)->carcter == (simb + j)->c) {
+				numBits = tamBits(simb + j) * (a+f)->freq;
+				printf("%c %d -> %d acumulado %d", (simb + j)->c, (a+f)->freq, tamBits, numBits);
+			}
+		}
+		f++;
+	} while (f < quant);
+}
+
