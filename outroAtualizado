@@ -611,6 +611,7 @@ int descompactar(FILE *file, struct simbolo *simb, struct sNo *vetorp[]) {
 	gp = g;
 	int tam, u, v=0, vAnt=0, loop= 0,d=1;
 	while (loop == 0) {
+		vetorNULL(gp);
 		for (int i = 0; i < checktam(vetorp); i++) {
 			tam = tamBits(simb + i) + 1;
 			for (u = 0; u < tam; u++) {
@@ -624,18 +625,21 @@ int descompactar(FILE *file, struct simbolo *simb, struct sNo *vetorp[]) {
 			else {
 				fprintf(file2, "%c", (simb + i)->c);
 				printf("%c", (simb + i)->c);
-				if (bit[v-1] == '\0') {
+				if (bit[v] == '\0') {
 					fclose(file2);
 					return 1;
 				}
-				v = v + tam - d;
 				d++;
 				vAnt = v;
 			}
+			
+			if (comparador(g, (simb + i)->sim) == 0) {
+
+			}
+			else {
+				break;
+			}
 			vetorNULL(gp);
-		
-
-
 		}
 		printf("se fudeu");
 	}
