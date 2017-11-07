@@ -716,5 +716,6 @@ int contaBits(struct simbolo *simb, struct sNo *a) {
 		}
 		f++;
 	} while (f < quant);
+	return 0;
 }
 
