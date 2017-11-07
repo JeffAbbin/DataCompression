@@ -1,0 +1,722 @@
+#define ERRO 		0
+#define OK 		 	1
+#define IGUAL 		10
+#define DIF		 	11
+
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// estrutura de um elemento, no da arvore
+struct sNo {
+	int valor, freq;
+	char carcter;
+	struct sNo *esq;
+	struct sNo *dir;
+};
+
+struct simbolo {
+	char c, sim[150];
+};
+
+typedef struct simbolo simbolo;
+typedef struct sNo sNo;
+
+sNo *inicializa();
+sNo *cria(int freq, char caracter, sNo *sae, sNo *sad, int res);
+
+
+int e_vazia(sNo *a);
+int busca(char c, sNo *a);
+
+void imprime_pre_order(sNo *a);
+void imprime_in_order(sNo *a);
+void imprime_pos_order(sNo *a);
+void imprime_textual(sNo *a);
+int checkVetor(char c, struct sNo *vetor);
+void printVetor(struct sNo *vetor);
+void inicilizaVetor(struct sNo *vetor);
+void ordenaVetor(struct sNo *vetor);
+void apontaVetor(struct sNo *vetorp[], struct sNo *vetor);
+void printVetorp(struct sNo *vetor[]);
+void ordenaVetorp(struct sNo *vetor[]);
+void montaArvore(struct sNo *vetorp[]);
+void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *s, int *j);
+void printTabela(struct simbolo *simb, struct sNo *vetorp[]);
+int checktam(struct sNo *vetorp[]);
+int bin_to_dec(int bin);
+void imprime_textualf(sNo *a, FILE *file);
+int descompactar(FILE *file, struct simbolo *simb, struct sNo *vetorp[]);
+int altura(sNo *a);
+int qtdeNos(sNo *a);
+int qtdeFolhas(sNo *a);
+int checkBits(char *byte);
+void inicializarByte(char *byte);
+void fprintTabela(struct simbolo *simb, struct sNo *vetorp[], FILE *file);
+int tamBits(struct simbolo *simb);
+bool comparador(char s1[], char s2[]);
+void vetorNULL(char *g);
+
+
+// int main(int argC, char *argV[])
+// if argC < 3 sair erro
+// argV[1] vai ter o -c ou -d
+// argV[2] vair ter o arq .txt
+// argV[3] o arq de saida
+// huff -c bla.txt bla.huf
+int main(int argC, char *argV[]) {
+	if (argC < 3) {
+		printf("Parametros Invalidos");
+		return -1;
+	}
+	if (strcmp(argV[1], "-c") == 0) {
+		int r, k = 0, v, cont = 0, q, j = 0, *jp, a = 0, bin, b;
+		sNo *a0, *a1, *a2, *a3, *a4, *a5;
+		FILE *file, *file2;
+		char c, aux, ch, string[150], *s, textob[1000], byte[8], textoInt[1000];
+		struct sNo *p, vn[255], *va[255], *vp;
+		struct simbolo simbolo[150];
+		vp = vn;
+		jp = &j;
+		int br = 0;
+
+		s = string;
+
+		inicilizaVetor(vp);
+
+		file = fopen(argV[2], "r");
+		if (file == NULL) {
+			printf("Erro - nao foi possivel ler arquivo\n");
+			return 0;
+		}
+
+		do {
+			c = fgetc(file);
+			if (checkVetor(c, vp) == DIF) {
+				(vn + k)->carcter = c;
+				(vn + k)->dir = NULL;
+				(vn + k)->esq = NULL;
+				rewind(file);
+				cont = 0;
+				do {
+					ch = fgetc(file);
+					if (c == ch) {
+						cont++;
+						(vn + k)->freq = cont;
+					}
+				} while (ch != EOF);
+				k++;
+				rewind(file);
+			}
+
+
+		} while (c != EOF);
+		(vn + (k - 1))->valor = NULL;
+		(vn + (k - 1))->carcter = NULL;
+		(vn + (k - 1))->dir = NULL;
+		(vn + (k - 1))->esq = NULL;
+		(vn + (k - 1))->freq = NULL;
+		apontaVetor(va, vn);
+
+		ordenaVetorp(va);
+		printf("caracter e freq:\n\n");
+		printVetorp(va);
+		printf("\n\n");
+
+		montaArvore(va);
+		criaTabela(simbolo, va[0], 0, s, &j);
+		printf("textual arvore:\n\n");
+		imprime_textual(va[0]);
+		printf("\n\n");
+		printf("tabela de Simbolo:\n");
+		printTabela(simbolo, va);
+		printf("\n\n");
+		printf("texto em binario:\n");
+		rewind(file);
+		int h = 0;
+		int batata;
+		batata = contaBits(simbolo, vp);
+		printf("Total de bits: %d", batata);
+		printf("\n");
+
+		do {
+			c = fgetc(file);
+			for (int q = 0; q < checktam(va); q++) {
+				if ((simbolo + q)->c == c) {
+					while ((simbolo + q)->sim[a] != '\0') {
+						textob[h] = (simbolo + q)->sim[a];
+						h++;
+						a++;
+					}
+					a = 0;
+				}
+			}
+
+		} while (c != EOF);
+
+
+
+		for (int v = 0; v < 1000; v++) {
+			if (textob[v] == '0' || textob[v] == '1')
+				printf("%c", textob[v]);
+		}
+
+		printf("\n\nbyte de saida em hexadecimal:\n");
+
+		/*for(i=0, i <= numero de simbolos, i++ )*/
+
+
+		int y = 0;
+		b = 0;
+		while (textob[b] == '0' || textob[b] == '1') {
+			for (int i = 0; i < 8; i++) {
+				byte[i] = textob[b];
+				b++;
+			}
+			bin = atol(byte);
+
+			textoInt[y] = bin_to_dec(bin);
+			printf("%x ", bin_to_dec(bin));
+
+			y++;
+		}
+
+		file2 = fopen(argV[3], "w");
+		if (file == NULL) {
+			printf("Erro - nao foi possivel ler arquivo\n");
+			return 0;
+		}
+
+		fprintf(file2, "JGL\n");
+		for (int i = 0; i < y; i++) {
+			fprintf(file2, "%c", textoInt[i]);
+		}
+		fprintf(file2, "\n");
+		fprintTabela(simbolo, va, file2);
+		int i = 0;
+		while ((simbolo + j)->sim[i] == '0' || (simbolo + j)->sim[i] == '1') {
+			i++;
+		}
+		fclose(file);
+		fclose(file2);
+	}
+	if (strcmp(argV[1], "-d") == 0) {
+		FILE *file3;
+		struct simbolo simbD[150];
+		struct sNo *va[255];
+		file3 = fopen(argV[2], "r");
+		if (file3 == NULL) {
+			printf("Erro - nao foi possivel ler arquivo\n");
+			return 0;
+		}
+		unsigned char c, id[3];
+		char byte[8], byte2[8], bit[1000];
+		unsigned int h, p, x, y = 0, m = 0, o = 0;
+		FILE *file2;
+		inicializarByte(byte2);
+		for (int i = 0; i < 3; i++) {
+			c = fgetc(file3);
+			id[i] = c;
+		}
+		if (id[0] != 'J' || id[1] != 'G' || id[2] != 'L') {
+			printf("esse nao é uma arquivo compactado\n");
+			return ERRO;
+		}
+		fgetc(file3);
+		c = fgetc(file3);
+		do {
+			p = 7;
+			inicializarByte(byte2);
+			h = c;
+			itoa(h, byte, 2);
+
+			for (int j = 0; j < checkBits(byte) + 1; j++) {
+				x = checkBits(byte) - j;
+				byte2[p] = byte[x];
+				p--;
+			}
+			printf("%c%s\n", c, byte2);
+			c = fgetc(file3);
+			if (c != '\n') {
+				for (int z = 0; z < 8; z++) {
+					bit[y] = byte2[z];
+					y++;
+				}
+			}
+
+
+
+		} while (c != '\n');
+		for (int z = 0; z < 8; z++) {
+			bit[y] = byte[z];
+			y++;
+		}
+		c = fgetc(file3);
+		do {
+
+			(simbD + o)->c = c;
+			c = fgetc(file3);
+			c = fgetc(file3);
+			do {
+				(simbD + o)->sim[m] = c;
+				m++;
+				c = fgetc(file3);
+			} while (c != '\n');
+			(simbD + o)->sim[m] = '\0';
+			c = fgetc(file3);
+			m = 0;
+			o++;
+		} while (c != 255);
+
+		file2 = fopen(argV[3], "w");
+		if (file2 == NULL) {
+			printf("Erro - nao foi possivel ler arquivo\n");
+			return 0;
+		}
+
+		char g[255], *gp;
+		gp = g;
+		int tam, u, v = 0, vAnt = 0, loop = 0, d = 1;
+		while (loop == 0) {
+			vetorNULL(gp);
+			for (int i = 0; i < checktam(va); i++) {
+				tam = tamBits(simbD + i) + 1;
+				for (u = 0; u < tam; u++) {
+					g[u] = bit[v];
+					v++;
+				}
+				g[u] = '\0';
+				if (comparador(g, (simbD + i)->sim) == 0) {
+					v = vAnt;
+				}
+				else {
+					fprintf(file2, "%c", (simbD + i)->c);
+					printf("%c", (simbD + i)->c);
+					if (bit[v] == '\0') {
+						fclose(file2);
+						return 1;
+					}
+					d++;
+					vAnt = v;
+				}
+
+				if (comparador(g, (simbD + i)->sim) == 0) {
+
+				}
+				else {
+					break;
+				}
+				vetorNULL(gp);
+			}
+			printf("se fudeu");
+		}
+
+
+
+
+
+
+		printf("%c\n", c);
+		printf("%s\n", bit);
+		return OK;
+
+
+
+
+		//printf("\n");
+
+		fclose(file3);
+
+
+
+	}
+
+}
+// 1) uma arvore binaria eh vazia, ou
+sNo *inicializa(void) {
+	return NULL;
+}
+// 2) eh composta por uma raiz e duas subarvores (esquerda e direita)
+sNo *cria(int freq, char caracter, sNo *sae, sNo *sad, int res) {
+	sNo *no;
+	no = (sNo *)malloc(sizeof(sNo));
+	if (no == NULL) res = ERRO;
+	else {
+		no->esq = sae;
+		no->dir = sad;
+		no->carcter = caracter;
+		no->freq = freq;
+		res = OK;
+	}
+	return no;
+}
+
+// verifica se arvore a eh vazia
+int e_vazia(sNo *a) {
+	return a == NULL;
+}
+
+// indica ocorrencia ou nao do valor na arvore
+int busca(char c, sNo *a) {
+	if (e_vazia(a))
+		return 0;
+	else // encontra ou busca a esquerda ou busca a direita, interrompe assim que achar
+		return a->carcter == c || busca(c, a->esq) || busca(c, a->dir);
+}
+
+// impressao dos nos da arvore:
+//    -> pre-order/pré-ordem: trata raiz, percorre sae, percorre sad
+//    -> in-order/ordem simétrica: percorre sae, trata raiz, percorre sad
+//    -> pos-order/pós-ordem: percorre sae, percorre sad, trata raiz
+void imprime_pre_order(sNo *a) {
+	if (!e_vazia(a)) {
+		printf("%d", a->valor);
+		if (a->carcter != NULL) {
+			printf("%c", a->carcter);
+		}
+		else
+			printf(" ");
+		imprime_pre_order(a->esq);
+		printf(" ");
+		imprime_pre_order(a->dir);
+		printf(" ");
+	}
+}
+
+void imprime_in_order(sNo *a) {
+	if (!e_vazia(a)) {
+		imprime_in_order(a->esq);
+		printf(" %d ", a->valor);
+		imprime_in_order(a->dir);
+	}
+}
+
+void imprime_pos_order(sNo *a) {
+	if (!e_vazia(a)) {
+		imprime_pos_order(a->esq);
+		imprime_pos_order(a->dir);
+		printf(" %d ", a->valor);
+	}
+}
+
+// representacao textual, percurso eh pre-order
+void imprime_textual(sNo *a) {
+	if (e_vazia(a))
+		printf("<>");
+	else {
+		printf("<%c/%d", a->carcter, a->freq);
+		imprime_textual(a->esq);
+		imprime_textual(a->dir);
+		printf(">");
+	}
+}
+
+void imprime_textualf(sNo *a, FILE *file) {
+	if (e_vazia(a))
+		fprintf(file, "<>");
+	else {
+		fprintf(file, "<%c/%d", a->carcter, a->freq);
+		imprime_textualf(a->esq, file);
+		imprime_textualf(a->dir, file);
+		fprintf(file, ">");
+	}
+}
+
+// retorna a altura da arvore
+int altura(sNo *a) {
+	int ae, ad;
+
+	if (a == NULL)
+		return -1; // arvore vazia tem altura -1 
+	else if (a->esq == NULL && a->dir == NULL)
+		return 0; // arvore com apenas raiz tem altura 0
+	else {
+		ae = altura(a->esq);
+		ad = altura(a->dir);
+		if (ae > ad)
+			return 1 + ae;
+		else
+			return 1 + ad;
+	}
+}
+
+// retorna a quantidade de nos da arvore
+int qtdeNos(sNo *a) {
+	if (a == NULL)
+		return 0;
+	else
+		return 1 + qtdeNos(a->esq) + qtdeNos(a->dir);
+}
+
+// retorna a quantidade de folhas (nos sem filhos) da arvore
+int qtdeFolhas(sNo *a) {
+	if (a == NULL)
+		return 0;
+	if (a->esq == NULL && a->dir == NULL)
+		return 1;
+	return qtdeFolhas(a->esq) + qtdeFolhas(a->dir);
+}
+
+int checkVetor(char c, struct sNo *vetor) {
+
+	for (int j = 0; j < 255; j++) {
+		if (c == (vetor + j)->carcter) {
+			return IGUAL;
+		}
+
+	}
+	return DIF;
+}
+
+void printVetor(struct sNo *vetor) {
+
+	for (int l = 0; l < 255; l++) {
+		if ((vetor + l)->carcter == NULL && (vetor + l)->dir == NULL && (vetor + l)->esq == NULL && (vetor + l)->freq == NULL && (vetor + l)->valor == NULL) {
+
+		}
+		else
+		{
+			printf("caracter %c frequencia %d\n", (vetor + l)->carcter, (vetor + l)->freq);
+		}
+	}
+}
+void printVetorp(struct sNo *vetor[]) {
+
+	for (int l = 0; l < 255; l++) {
+		if (vetor[l]->carcter == NULL && vetor[l]->dir == NULL && vetor[l]->esq == NULL && vetor[l]->freq == NULL && vetor[l]->valor == NULL) {
+
+		}
+		else
+		{
+			printf("caracter %c frequencia %d\n", vetor[l]->carcter, vetor[l]->freq);
+		}
+	}
+}
+
+void inicilizaVetor(struct sNo *vetor) {
+	for (int t = 0; t < 255; t++) {
+		(vetor + t)->carcter = NULL;
+		(vetor + t)->dir = NULL;
+		(vetor + t)->esq = NULL;
+		(vetor + t)->freq = NULL;
+		(vetor + t)->valor = NULL;
+	}
+
+}
+
+void ordenaVetor(struct sNo *vetor) {
+	for (int l = 0; l < 255; l++) {
+		if ((vetor + l)->carcter == NULL && (vetor + l)->dir == NULL && (vetor + l)->esq == NULL && (vetor + l)->freq == NULL && (vetor + l)->valor == NULL) {
+
+		}
+		else
+		{
+			int p;
+			struct sNo aux2;
+
+			for (int d = 1; d < 255; d++) {
+				aux2 = vetor[d];
+				p = d - 1;
+				while (p >= 0 && (vetor + p)->freq < aux2.freq) {
+					vetor[p + 1] = vetor[p];
+					p--;
+				}
+				vetor[p + 1] = aux2;
+			}
+		}
+	}
+}
+
+
+
+void ordenaVetorp(struct sNo *vetor[]) {
+	for (int l = 0; l < 255; l++) {
+		if (vetor[l]->carcter == NULL && vetor[l]->dir == NULL && vetor[l]->esq == NULL && vetor[l]->freq == NULL && vetor[l]->valor == NULL) {
+
+		}
+		else
+		{
+			int p;
+			struct sNo *aux2;
+
+			for (int d = 1; d < 255; d++) {
+				aux2 = vetor[d];
+				p = d - 1;
+				while (p >= 0 && vetor[p]->freq < aux2->freq) {
+					vetor[p + 1] = vetor[p];
+					p--;
+				}
+				vetor[p + 1] = aux2;
+			}
+		}
+	}
+}
+
+void apontaVetor(struct sNo *vetorp[], struct sNo *vetor) {
+	for (int i = 0; i < 255; i++) {
+		vetorp[i] = (vetor + i);
+	}
+
+}
+
+void montaArvore(struct sNo *vetorp[]) {
+	struct sNo *esq, *dir, *no;
+	int j = 0, s;
+	for (int l = 0; l < 255; l++) {
+		if (vetorp[l]->carcter == NULL && vetorp[l]->dir == NULL && vetorp[l]->esq == NULL && vetorp[l]->freq == NULL && vetorp[l]->valor == NULL) {
+		}
+		else
+		{
+			j++;
+		}
+	}
+	while (j > 1) {
+		ordenaVetorp(vetorp);
+		dir = vetorp[j - 1];
+		esq = vetorp[j - 2];
+		s = esq->freq + dir->freq;
+		no = cria(s, '_', esq, dir, OK);
+		vetorp[j - 2] = no;
+		j--;
+	}
+
+}
+
+
+void criaTabela(struct simbolo *simb, struct sNo *no, int pos, char *string, int *j) {
+
+
+	if (no->esq == NULL && no->dir == NULL) {
+		string[pos] = '\0';
+		(simb + *j)->c = no->carcter;
+		strcpy((simb + *j)->sim, string);
+		*j = *j + 1;
+		return;
+	}
+
+	/*strncpy copia os caracteres de uma string para outra, e podemos decidir o tamanho que será copiado*/
+
+	if (no->esq != NULL) //se subarvre da esquerda != de nulo
+	{
+		string[pos] = '0'; //define o nó da subarvore da esquerda (na posição definida) como `0`
+		criaTabela(simb, no->esq, pos + 1, string, j); //recursivamente roda a mesma função para mais uma vez rodar a subarvore da esquerda, porém numa posição na frente
+	}
+	if (no->dir != NULL) { //se subarvore da direita != de nulo
+		string[pos] = '1'; //define o nó da subarvore da direita (na posição definida) como `1`
+		criaTabela(simb, no->dir, pos + 1, string, j);//recursivamente roda a mesma função para mais uma vez rodar a subarvore da direita, porém numa posição na frente
+	}
+}
+
+void printTabela(struct simbolo *simb, struct sNo *vetorp[]) {
+	int i = 0;
+	for (int j = 0; j < checktam(vetorp); j++) {
+
+		printf("%c ", (simb + j)->c);
+		while ((simb + j)->sim[i] == '0' || (simb + j)->sim[i] == '1') {
+			printf("%c", (simb + j)->sim[i]);
+			i++;
+		}
+		printf("\n");
+		i = 0;
+	}
+
+}
+void fprintTabela(struct simbolo *simb, struct sNo *vetorp[], FILE *file) {
+	int i = 0;
+	for (int j = 0; j < checktam(vetorp); j++) {
+
+		fprintf(file, "%c ", (simb + j)->c);
+		while ((simb + j)->sim[i] == '0' || (simb + j)->sim[i] == '1') {
+			fprintf(file, "%c", (simb + j)->sim[i]);
+			i++;
+		}
+		fprintf(file, "\n");
+		i = 0;
+	}
+
+}
+
+int checktam(struct sNo *vetorp[]) {
+	int j = 0;
+	for (int l = 0; l < 255; l++) {
+		if (vetorp[l]->carcter == NULL && vetorp[l]->dir == NULL && vetorp[l]->esq == NULL && vetorp[l]->freq == NULL && vetorp[l]->valor == NULL) {
+		}
+		else
+		{
+			j++;
+		}
+	}
+	return j;
+}
+int bin_to_dec(int bin)
+{
+	int total = 0;
+	int potenc = 1;
+
+	while (bin > 0) {
+		total += bin % 10 * potenc;
+		bin = bin / 10;
+		potenc = potenc * 2;
+	}
+
+	return total;
+}
+
+
+void inicializarByte(char *byte) {
+	for (int i = 0; i < 8; i++) {
+		byte[i] = '0';
+	}
+
+}
+
+int checkBits(char *byte) {
+	int i = 0;
+	do {
+		i++;
+	} while (byte[i] != '\0');
+	return i - 1;
+}
+
+int tamBits(struct simbolo *simb) {
+	int i = 0;
+	do {
+		i++;
+	} while (simb->sim[i] != '\0');
+	return i - 1;
+
+}
+
+
+bool comparador(char s1[], char s2[]) {
+	int i = 0;
+	while (s1[i] == s2[i] && s1[i] != '\0' && s2[i] != '\0') {
+		i++;
+	}
+
+	if (s1[i] == '\0' && s2[i] == '\0') {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+void vetorNULL(char *g) {
+	for (int x = 0; x < 255; x++) {
+		g[x] = NULL;
+	}
+}
+
+int contaBits(struct simbolo *simb, struct sNo *a) {
+	int j = 0, quant, numBits, f;
+	char caracter;
+	quant = qtdeFolhas(a);
+	for (j = 0; j <= quant; j++) {
+		numBits = tamBits(simb);
+		f = numBits* (a->freq);
+		f = f + f;
+	}
+	return f;
+}
